@@ -5,6 +5,9 @@ body {
   font-weight: 400;
   font-size: 13px;
 }
+.filter-text{
+  color: "white"!important
+}
 
 @media (min-width:350px){
   .dark_body::before {
@@ -87,4 +90,8 @@ footer {
 img {
   vertical-align: middle;
   border-style: none;
+}
+
+.filter-text{
+  color: "white"
 }

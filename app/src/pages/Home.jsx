@@ -5,6 +5,13 @@ import { BiSupport } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { BsTelegram, BsWhatsapp, BsFacebook, BsInstagram, } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
+import DataTableExtensions from 'react-data-table-component-extensions';
+import 'react-data-table-component-extensions/dist/index.css';
+import '../index.css'
+import axios from 'axios'
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import {IoChatbubbleOutline} from 'react-icons/all'
 
 import { CONTRACT_ADDRESS } from "../HelperFunction/config"
 import { getIncome, getTeam, getUserInfo, getWithdraw, onConnect, royaltyWithdraw, userIdByWallet, globalStat, getRequiredMembers } from "../HelperFunction/script";
@@ -44,7 +51,71 @@ export default function Home() {
   const [viewmode, setViewMode] = useState(1);
   const [viewmodeflag, setViewModeFlag] = useState(0);
   const [smartBalance, setSmartBalance] = useState(0);
+  const [ltRateINR, setltRateINR] = useState(0)
+  const [ltRateUSDT, setLTRateUSDT] = useState(0)
+  const [bdtprice, setbdtPrice] = useState(0)
+  const [lev, setLev] = useState(0)
+  const [selectedlevel, setSelectedLevel] = useState('');
+  const [income2, setIncome2] = useState([]);
+  const [team2, setTeam2] = useState([]);
+  const [selectedlevelTeam, setSelectedLevelTeam] = useState('')
 
+  const levels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9', 'Level 10', 'Level 11', 'Level 12', 'Level 13', 'Level 14', 'Level 15']
+  const incomeType = ['Sponsor Income', 'Stair Income', 'Stacked Income']
+
+  useEffect(() => {
+    axios.get('https://api.buyucoin.com/ticker/v1.0/liveData?symbol=BDLT-INR').then((res) => {
+      setltRateINR(res.data.data[0].LTRate, "LT Rate inr")
+    }).catch((err) => {
+
+    })
+
+    axios.get('https://api.buyucoin.com/ticker/v1.0/liveData?symbol=USDT-INR').then((res) => {
+      setLTRateUSDT(res.data.data[0].LTRate, "usdt")
+    }).catch((err) => {
+
+    })
+
+    const value = ltRateINR / ltRateUSDT
+    // console.log(value, "Value")
+    setbdtPrice(value)
+  }, [])
+
+
+  useEffect(() => {
+    if (income.length > 0 && selectedlevel) {
+      const l = selectedlevel.split(" ");
+      const arr = income.filter((item) => item.level == l[1]);
+      setIncome2(arr);
+    }
+  }, [selectedlevel]);
+
+  useEffect(() => {
+    if (team.length > 0 && selectedlevelTeam) {
+      const arr = team.filter((item) => item.level == selectedlevelTeam);
+      setTeam2(arr)
+    }
+  }, [selectedlevelTeam])
+
+  useEffect(() => {
+    if (income.length > 0) {
+      const arr = income.filter((item) => item.level == 1);
+      setIncome2(arr);
+    }
+  }, [income]);
+
+  useEffect(() => {
+    if (team.length > 0) {
+      const arr = team.filter((item) => item.level == 'Level 1');
+      setTeam2(arr);
+    }
+  }, [team])
+
+  useEffect(() => {
+    const value = ltRateINR / ltRateUSDT
+    // console.log(value, "Value")
+    setbdtPrice(value)
+  }, [ltRateINR, ltRateUSDT]);
   const ref_addr = window.location.href;
   const reflink = useRef();
 
@@ -52,6 +123,9 @@ export default function Home() {
     return Math.round(number * 1000) / 1000;
   }
 
+  const css = {
+    color: "white"
+  }
   useEffect(() => {
 
     const url_address = window?.frames?.location?.href;
@@ -107,7 +181,7 @@ export default function Home() {
       name: "Target Status",
       selector: "vip2",
       sortable: true,
-      cell: data => <span className={`badge text-white ${data.total_member > data.required_member ? 'bg-success' : 'bg-danger'}`}>{(data.total_member > data.required_member ? "Achieved" : "Not Achieved")}</span>
+      cell: data => <span className={`badge text-white ${data.total_member >= data.required_member ? 'bg-success' : 'bg-danger'}`}>{(data.total_member >= data.required_member ? "Achieved" : "Not Achieved")}</span>
     },
   ];
 
@@ -175,6 +249,14 @@ export default function Home() {
         backgroundColor: "transparent",
         color: "rgba(63, 195, 128, 0.9)",
       },
+    }, {
+      name: "User Id",
+      selector: (row) => row.userId,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
     },
     {
       name: "Sender",
@@ -227,7 +309,6 @@ export default function Home() {
         color: "black",
       },
     },
-
     {
       name: "Transaction Id",
       selector: (row) => (
@@ -322,6 +403,7 @@ export default function Home() {
         fontWeight: "500",
         textTransform: "uppercase",
         paddingLeft: "0 8px",
+
       },
     },
     cells: {
@@ -383,6 +465,7 @@ export default function Home() {
         console.log(e);
       });
       getIncome(wallet_address).then((ss) => {
+        // console.log(ss, "ammm")
         if (ss) {
           setIncome(ss.result);
         }
@@ -564,6 +647,23 @@ export default function Home() {
 
   return (
     <>
+      <div class="container">
+          <div class="ticker">
+           {/*  <div class="title">
+              <h5>Offer</h5>
+            </div> */}
+      
+            <div class="news">
+              <marquee class="news-content">
+                Learning development program(LDP)
+                Qualify criteria- Direct 10 Members or 1st to 4th level qualified
+                Max Members- First 150 team Members only
+                Time period- 1March -31March
+                LDP duration- 3days 2 night
+              </marquee>
+            </div>
+          </div>
+        </div>
       <div className="container text-center mt-4">
         <div className="row">
           <div
@@ -582,8 +682,8 @@ export default function Home() {
                 className="col-md-6 col-lg-6 col-sm-12 asm d-flex justify-content-center"
                 style={{ flexDirection: "column" }}
               >
-                <a class="grad_btn btn-block text-light my-2" style={{fontSize:"0.875rem"}} onClick={()=>window.addNetwork("web3")}>
-                  <img class="mr-1" width={24} src="https://bscscan.com/images/svg/brands/metamask.svg" alt="Metamask"/> Add to Metamask
+                <a class="grad_btn btn-block text-light my-2" style={{ fontSize: "0.875rem" }} onClick={() => window.addNetwork("web3")}>
+                  <img class="mr-1" width={24} src="https://bscscan.com/images/svg/brands/metamask.svg" alt="Metamask" /> Add to Metamask
                 </a>
 
               </div>
@@ -620,19 +720,26 @@ export default function Home() {
         </div>
       </section>
       <section>
+      
         <div className="container">
           <div className="row cus_row">
-            <div className="col-md-6 col-sm-6 col-6">
+            <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4> Smart Contract Address </h4>
                 <h5><a href={`https://explorer.bdltscan.io/address/${CONTRACT_ADDRESS}/contracts`} target={"_blank"} style={{ color: "white", textDecoration: "none" }}>{CONTRACT_ADDRESS.substr(0, 5)}....{CONTRACT_ADDRESS.substr(-8)}<FiExternalLink size={18} className="mx-1 pb-1" color="white" /></a></h5>
               </div>
             </div>
 
-            <div className="col-md-6 col-sm-6 col-6">
+            <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4>Contract Balance </h4>
                 <h5>{round(smartBalance)} BDLT</h5>
+              </div>
+            </div>
+            <div className="col-md-4 col-sm-6 col-6">
+              <div className="Personal_Details_inner">
+                <h4>Total Node Member  </h4>
+                <h5>{round(0)} BDLT</h5>
               </div>
             </div>
           </div>
@@ -662,9 +769,10 @@ export default function Home() {
             <div className="col-md-3 col-sm-3 col-6">
               <div className="Personal_Details_inner">
                 <h4>BDLT Price </h4>
-                <h5>$ {round(price)}</h5>
+                <h5>$ {bdtprice ? bdtprice.toFixed(3) : 0}</h5>
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -829,6 +937,7 @@ export default function Home() {
                   </span>{" "}
                 </h6>
                 {viewmodeflag == 0 ? (
+
                   <button
                     className="grad_btn btn-block mx-4"
                     style={{ padding: "10px 15px" }}
@@ -846,9 +955,15 @@ export default function Home() {
                   >
                     Connect Wallet
                   </button>
-                ) : (
-                  <></>
-                )}
+
+
+
+
+                )
+                  : (
+                    <></>
+                  )}
+                <button className="grad_btn btn-block mx-4 mt-5"> Upgrade Node</button>
               </div>
             </div>
           </div>
@@ -907,22 +1022,28 @@ export default function Home() {
           </div>
           {/* Third row */}
           <div className="row cus_row">
-            <div className="col-md-6 col-sm-6 col-lg-6">
+            <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Total Income</h4>
                 <h5>{round((roi ? Number(roi) : 0) + (royaltyWallet ? Number(royaltyWallet) : 0) + Number(withdrawalAmt)).toFixed(2)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-6 col-sm-6 col-lg-6">
+            <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner">
                 <h4>Total Withdrawal</h4>
                 <h5>{round(withdrawalAmt ? Number(withdrawalAmt).toFixed(2) : 0)} BDLT</h5>
               </div>
             </div>
+            <div className="col-md-4 col-sm-4 col-lg-4">
+              <div className="Personal_Details_inner">
+                <h4>Stacking Rewards</h4>
+                <h5>{0} BDLT</h5>
+              </div>
+            </div>
           </div>
           {/* fourth row*/}
           <div className="row cus_row">
-            <div className="col-md-6 col-sm-6 col-lg-6">
+            <div className="col-md-3 col-sm-3 col-lg-3">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Roi Income</h4>
                 <h5>{Number(roi).toFixed(2)} BDLT</h5>
@@ -931,12 +1052,42 @@ export default function Home() {
                 </button>
               </div>
             </div>
-            <div className="col-md-6 col-sm-6 col-lg-6">
+            <div className="col-md-3 col-sm-3 col-lg-3">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Royalty Income</h4>
                 <h5>{royaltyWallet ? royaltyWallet : 0} BDLT</h5>
                 <button className="grad_btn my-2" onClick={onRoyaltyWithdraw}>
                   Withdraw Royalty
+                </button>
+              </div>
+            </div>
+            <div className="col-md-3 col-sm-3 col-lg-3">
+              <div className="Personal_Details_inner Personal_bg">
+                <h4>Self Node ROI</h4>
+                <h5>{0} BDLT</h5>
+                <button className="grad_btn my-2" onClick={onRoyaltyWithdraw}>
+                  Withdraw Roi
+                </button>
+              </div>
+            </div>
+            <div className="col-md-3 col-sm-3 col-lg-3">
+              <div className="Personal_Details_inner Personal_bg">
+                <h4>Direct Sponsor ROI</h4>
+                <h5>{0} BDLT</h5>
+                <button className="grad_btn my-2" onClick={onRoyaltyWithdraw}>
+                  Withdraw Roi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="row cus_row">
+            <div className="col-md-12 col-sm-12 col-lg-12">
+              <div className="Personal_Details_inner Personal_bg">
+                <h4>Node Level ROI</h4>
+                <h5>{0} BDLT</h5>
+                <button className="grad_btn my-2" onClick={onWithdraw}>
+                  Withdraw Roi
                 </button>
               </div>
             </div>
@@ -955,6 +1106,7 @@ export default function Home() {
           <div className="sm_container">
             <div className="table_inner">
               <div className="table-responsive gridtable">
+
                 <DataTable
                   columns={requiredmembercolumn}
                   data={
@@ -967,6 +1119,7 @@ export default function Home() {
                   progressPending={false}
                   customStyles={customStyles}
                 />
+
               </div>
             </div>
           </div>
@@ -981,13 +1134,28 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container">
+            <select style={{ color: "white", backgroundColor: "black", border: "none" }}
+              value={selectedlevelTeam ? selectedlevelTeam : 'Level 1'}
+              onChange={(e) => {
+                setSelectedLevelTeam(e.target.value);
+              }}>
+              {
+                levels.map((data, index) => {
+                  return (
+                    <option value={data} key={index}>{data}</option>
+                  )
+                })
+              }
+
+            </select>
             <div className="table_inner">
               <div className="table-responsive gridtable">
+
                 <DataTable
                   columns={teamcolumn}
                   data={
-                    team ? team.length > 0
-                      ? team
+                    team2 ? team2.length > 0
+                      ? team2
                       : [] : []
                   }
                   pagination
@@ -995,6 +1163,7 @@ export default function Home() {
                   progressPending={false}
                   customStyles={customStyles}
                 />
+
               </div>
             </div>
           </div>
@@ -1011,13 +1180,44 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container">
+            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px" }}
+              value={selectedlevel ? selectedlevel : 'Level 1'}
+              onChange={(e) => {
+                console.log("selected level::", e.target.value);
+                setSelectedLevel(e.target.value);
+              }}>
+              {
+                levels.map((data, index) => {
+                  return (
+
+                    <option value={data} key={index}>{data}</option>
+                  )
+                })
+              }
+            </select>
+
+            <select className="px-2" style={{ color: "white", backgroundColor: "black", border: "none" }}
+              value={selectedlevel ? selectedlevel : ''}
+              /* onChange={(e) => {
+                console.log("selected level::", e.target.value);
+                setSelectedLevel(e.target.value);
+              }} */>
+              {
+                incomeType.map((data, index) => {
+                  return (
+
+                    <option value={data} key={index}>{data}</option>
+                  )
+                })
+              }
+            </select>
             <div className="table_inner">
               <div className="table-responsive gridtable">
                 <DataTable
                   columns={incomecolumn}
                   data={
-                    income ? income.length > 0
-                      ? income
+                    income2 ? income2.length > 0
+                      ? income2
                       : [] : []
                   }
                   pagination
@@ -1032,16 +1232,17 @@ export default function Home() {
       </section>
 
 
-      <section className="pb_50">
+      <section className="pb_50 text-light">
         <div className="container">
           <div className="all_heading text-center">
             <h2>
               <span>Withdrawal History</span>
             </h2>
           </div>
-          <div className="sm_container">
+          <div className="sm_container text-light">
             <div className="table_inner">
               <div className="table-responsive gridtable">
+
                 <DataTable
                   columns={withdrawcolumn}
                   data={withdraw ? withdraw : []}
@@ -1050,6 +1251,59 @@ export default function Home() {
                   progressPending={false}
                   customStyles={customStyles}
                 />
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb_50 text-light">
+        <div className="container">
+          <div className="all_heading text-center">
+            <h2>
+              <span>Direct Sponsor Node</span>
+            </h2>
+          </div>
+          <div className="sm_container text-light">
+            <div className="table_inner">
+              <div className="table-responsive gridtable">
+
+                <DataTable
+                  columns={withdrawcolumn}
+                  data={withdraw ? withdraw : []}
+                  pagination
+                  paginationPerPage={4}
+                  progressPending={false}
+                  customStyles={customStyles}
+                />
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb_50 text-light">
+        <div className="container">
+          <div className="all_heading text-center">
+            <h2>
+              <span>Level Sponsor Node</span>
+            </h2>
+          </div>
+          <div className="sm_container text-light">
+            <div className="table_inner">
+              <div className="table-responsive gridtable">
+
+                <DataTable
+                  columns={withdrawcolumn}
+                  data={withdraw ? withdraw : []}
+                  pagination
+                  paginationPerPage={4}
+                  progressPending={false}
+                  customStyles={customStyles}
+                />
+
               </div>
             </div>
           </div>
@@ -1155,7 +1409,7 @@ export default function Home() {
                   />
                   Smart Contract info
                 </a>
-                 <a
+                <a
                   class="grad_btn my-3 mt-4"
                   href="https://bdltcommunity.io/support/Login.php"
                   target="_blank"
