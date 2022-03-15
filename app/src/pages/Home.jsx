@@ -969,7 +969,7 @@ export default function Home() {
               {" "}
               World First Decentralized Program on BDLT Blockchain. All Funds
               are store in Smart Contract and members can withdraw their reward
-              directly from Smart contract. Get 200% Return On Stack .
+              directly from Smart contract. Get 200% Return On Stake .
             </p>
           </div>
         </div>
@@ -1072,7 +1072,7 @@ export default function Home() {
                           setBalance(round(d?.balance));
                           setContract(d?.contract);
                           setWalletAddress(d?.userAddress);
-                          // setWalletAddress("0x6B63b63ce0c59D63a263B1B8cF9c52D912b9A608");
+                          // setWalletAddress("0x4d5181BE0CF14C8F6E125D833dE4D9AcAA4aBe16");
                           setJoiningPackage(d?.joiningPackage);
                         })
                         .catch((e) => console.log(e));
@@ -1402,8 +1402,8 @@ export default function Home() {
                     <h4>Self Node ROS</h4>
                     <h5>{selfNodeRoi ? Number(selfNodeRoi).toString() : 0} BDLT</h5>
                   </div>
-                  <div className="col-6 col-md-6">
-                    <h4>Direct Sponsor ROS</h4>
+                  <div className="col-6 col-md-6"> 
+                    <h4>Sponsor Node ROS</h4>
                     <h5>{directSponsorRoi ? Number(directSponsorRoi).toFixed(2) : 0} BDLT</h5>
                   </div>
                 </div>
