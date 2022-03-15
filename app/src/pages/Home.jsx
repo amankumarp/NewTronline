@@ -1071,8 +1071,8 @@ export default function Home() {
                           console.log(d);
                           setBalance(round(d?.balance));
                           setContract(d?.contract);
-                          // setWalletAddress(d?.userAddress);
-                          setWalletAddress("0x6B63b63ce0c59D63a263B1B8cF9c52D912b9A608");
+                          setWalletAddress(d?.userAddress);
+                          // setWalletAddress("0x6B63b63ce0c59D63a263B1B8cF9c52D912b9A608");
                           setJoiningPackage(d?.joiningPackage);
                         })
                         .catch((e) => console.log(e));
