@@ -114,8 +114,8 @@ export default function Home() {
         console.log(it1, arr);
         setIncome2(arr);
       } else if (selectedIncome === 'Node Stair Income') {
-        const arr = income.filter((item) => item._for === it1);
         it1 = itarr[3];
+        const arr = income.filter((item) => item._for === it1);
         console.log(it1, arr);
         setIncome2(arr);
       } else {
@@ -142,8 +142,8 @@ export default function Home() {
   useEffect(() => {
 
     if (income.length > 0) {
-      const arr = income.filter((item) => item.level == 1);
-      setIncome2(arr);
+      // const arr = income.filter((item) => item.level == 1);
+      setIncome2(income);
     }
   }, [income]);
 
@@ -195,7 +195,7 @@ export default function Home() {
       console.log("global Data", d);
       setTotalmember(d.result.totalUser);
       setTotalInv(d.result.totalPayout);
-      setPrice(d?.price ?? 0);
+      setPrice(d?.totalNodeBuy ?? 0);
       setSmartBalance(d?.contract_balance);
       setTotalWithdraw(d?.withdraw ?? 0);
     }).catch(e => console.log(e));
@@ -346,7 +346,7 @@ export default function Home() {
     },
     {
       name: "Income Type",
-      selector: (row) => row._for == "direct_sponcer" ? "Sponsor Income" : row._for == "reward_income" ? "Star Income" : "Stair Income",
+      selector: (row) => row._for == "direct_sponcer" ? "Sponsor Income" : row._for == "reward_income" ? "Star Income" :row._for=="node_stair_income"?"Node Stair Reward": "Stair Income",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -574,7 +574,7 @@ export default function Home() {
             );
 
             setNodeLevelRoi(
-              d.data.node.stairIncome ? Math.round((Number(d.data.node.stairIncome) / 1e18) * 1000000000) / 1000000000 : 0
+              d.data.node[2] ? Math.round((Number(d.data.node[2]) / 1e18) * 1000000000) / 1000000000 : 0
             );
             setRefferer(d.data.referrer);
             console.log("Royalty Wallet :: ", d.result[0].royalty_wallet)
@@ -969,7 +969,7 @@ export default function Home() {
               {" "}
               World First Decentralized Program on BDLT Blockchain. All Funds
               are store in Smart Contract and members can withdraw their reward
-              directly from Smart contract. Get 200% Return On Investment .
+              directly from Smart contract. Get 200% Return On Stack .
             </p>
           </div>
         </div>
@@ -994,7 +994,7 @@ export default function Home() {
             <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4>Total Node Member  </h4>
-                <h5>{round(0)} BDLT</h5>
+                <h5>{price}</h5>
               </div>
             </div>
           </div>
@@ -1071,7 +1071,8 @@ export default function Home() {
                           console.log(d);
                           setBalance(round(d?.balance));
                           setContract(d?.contract);
-                          setWalletAddress(d?.userAddress);
+                          // setWalletAddress(d?.userAddress);
+                          setWalletAddress("0x6B63b63ce0c59D63a263B1B8cF9c52D912b9A608");
                           setJoiningPackage(d?.joiningPackage);
                         })
                         .catch((e) => console.log(e));
@@ -1589,7 +1590,7 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container text-light">
-            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px", width: "150px" }}
+            {/* <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px", width: "150px" }}
               // value={selectedNode ? selectedNode : 'Sponsor Node'}
               onChange={(e) => {
                 console.log("selected level::", e.target.value);
@@ -1603,7 +1604,7 @@ export default function Home() {
                   )
                 })
               }
-            </select>
+            </select> */}
             <div className="table_inner">
               <div className="table-responsive gridtable">
 
