@@ -21,10 +21,12 @@
         "react-redux": "^7.2.6",
         "react-router-dom": "^6.1.1",
         "react-scripts": "4.0.3",
+        "react-timer-hook": "^3.0.5",
         "redux": "^4.1.2",
         "redux-thunk": "^2.4.0",
         "socket.io-client": "^4.3.2",
         "styled-components": "^5.3.3",
+        "timer-node": "^5.0.5",
         "web-vitals": "^1.1.2",
         "web3": "^1.7.0",
         "web3modal": "^1.9.5"

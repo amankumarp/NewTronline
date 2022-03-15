@@ -52,7 +52,20 @@ export const getUserInfo = (user) => {
 }
 
 export const getIncome = (user) => {
-    return fetch(`${url}/income`, {
+        return fetch(`${url}/income`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: user,
+                })
+            }).then(d => d.json())
+            .catch(e => e)
+    }
+    //Node reward
+export const getLevelSponsor = (user) => {
+    return fetch(`${url}/get-node-reward`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -63,6 +76,7 @@ export const getIncome = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+
 export const getWithdraw = (user) => {
     return fetch(`${url}/withdraw-history`, {
             method: "POST",

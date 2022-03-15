@@ -9,15 +9,15 @@ import DataTableExtensions from 'react-data-table-component-extensions';
 import 'react-data-table-component-extensions/dist/index.css';
 import '../index.css'
 import axios from 'axios'
-import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
-import {IoChatbubbleOutline} from 'react-icons/all'
+import { IoChatbubbleOutline } from 'react-icons/all'
+import MyTimer from "../Component/Timer";
 
 import { CONTRACT_ADDRESS } from "../HelperFunction/config"
-import { getIncome, getTeam, getUserInfo, getWithdraw, onConnect, royaltyWithdraw, userIdByWallet, globalStat, getRequiredMembers } from "../HelperFunction/script";
+import { getIncome, getTeam, getUserInfo, getWithdraw, onConnect, royaltyWithdraw, userIdByWallet, globalStat, getRequiredMembers, getLevelSponsor } from "../HelperFunction/script";
 
 export default function Home() {
-  const state = useSelector((state) => state);
+  const { isUnstake } = useSelector((state) => state.appStore);
   const [wallet_address, setWalletAddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [team, setTeam] = useState([]);
@@ -54,32 +54,27 @@ export default function Home() {
   const [ltRateINR, setltRateINR] = useState(0)
   const [ltRateUSDT, setLTRateUSDT] = useState(0)
   const [bdtprice, setbdtPrice] = useState(0)
-  const [lev, setLev] = useState(0)
   const [selectedlevel, setSelectedLevel] = useState('');
   const [income2, setIncome2] = useState([]);
   const [team2, setTeam2] = useState([]);
   const [selectedlevelTeam, setSelectedLevelTeam] = useState('')
+  const [stackingReward, setStackingReward] = useState(0)
+  const [directSponsorRoi, setDirectSponsorRoi] = useState(0)
+  const [selfNodeRoi, setSelfNodeRoi] = useState(0)
+  const [nodeLevelRoi, setNodeLevelRoi] = useState(0)
+  const [levelNode, setLevelNode] = useState(0)
+  const [nodeBy, setNodeby] = useState(0)
+  const [selectedIncome, setSelectedIncome] = useState('')
+  const [selectedNode, setSelectedNode] = useState([])
+  const [nodetabType, setNodeTabType] = useState([])
+  const [levelNode2, setLevelNode2] = useState([])
 
-  const levels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9', 'Level 10', 'Level 11', 'Level 12', 'Level 13', 'Level 14', 'Level 15']
-  const incomeType = ['Sponsor Income', 'Stair Income', 'Stacked Income']
 
-  useEffect(() => {
-    axios.get('https://api.buyucoin.com/ticker/v1.0/liveData?symbol=BDLT-INR').then((res) => {
-      setltRateINR(res.data.data[0].LTRate, "LT Rate inr")
-    }).catch((err) => {
 
-    })
+  const levels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9', 'Level 10', 'Level 11', 'Level 12', 'Level 13', 'Level 14', 'Level 15', 'Level 16', 'Level 17', 'Level 18', 'Level 19', 'Level 20', 'Level 21', 'Level 22', 'Level 23', 'Level 24', 'Level 25', 'Level 26', 'Level 27', 'Level 28', 'Level 29', 'Level 30', 'Level 31', 'Level 32', 'Level 33', 'Level 34', 'Level 35', 'Level 36', 'Level 37', 'Level 38', 'Level 39', 'Level 40']
+  const incometype = ['Sponsor income', 'Stair Income', 'Star Income', "Node Stair Income"]
+  const nodeType = ['Sponsor Node', "Stair Node"]
 
-    axios.get('https://api.buyucoin.com/ticker/v1.0/liveData?symbol=USDT-INR').then((res) => {
-      setLTRateUSDT(res.data.data[0].LTRate, "usdt")
-    }).catch((err) => {
-
-    })
-
-    const value = ltRateINR / ltRateUSDT
-    // console.log(value, "Value")
-    setbdtPrice(value)
-  }, [])
 
 
   useEffect(() => {
@@ -98,6 +93,54 @@ export default function Home() {
   }, [selectedlevelTeam])
 
   useEffect(() => {
+    const itarr = ['reward_income', 'level_income', 'direct_sponcer', 'node_stair_income'];
+    if (income.length > 0 && selectedIncome) {
+      // console.log(selectedIncome, "selected")
+      let it1 = '';
+      if (selectedIncome === 'Sponsor income') {
+        it1 = itarr[2];
+        const arr = income.filter((item) => item._for === it1);
+        console.log(it1, arr);
+        setIncome2(arr);
+      } else if (selectedIncome === 'Stair Income') {
+        it1 = itarr[1];
+        const arr = income.filter((item) => item._for === it1);
+        console.log(it1, arr);
+        setIncome2(arr);
+      }
+      else if (selectedIncome === 'Star Income') {
+        it1 = itarr[0];
+        const arr = income.filter((item) => item._for === it1);
+        console.log(it1, arr);
+        setIncome2(arr);
+      } else if (selectedIncome === 'Node Stair Income') {
+        const arr = income.filter((item) => item._for === it1);
+        it1 = itarr[3];
+        console.log(it1, arr);
+        setIncome2(arr);
+      } else {
+        setIncome2(income);
+      }
+    }
+  }, [selectedIncome])
+
+  useEffect(() => {
+    const nrr = ['level_roi', 'sponcer_roi'];
+    if (levelNode.length > 0 && selectedNode) {
+      let it2 = ''
+      if (selectedNode === 'Sponsor Node') {
+        it2 = nrr[1]
+      } else if (selectedNode === 'Stair Node') {
+        it2 = nrr[0]
+      }
+      console.log(it2, levelNode);
+      const arr = levelNode.filter((item) => item._type === it2)
+      setLevelNode2(arr);
+    }
+  }, [selectedNode])
+
+  useEffect(() => {
+
     if (income.length > 0) {
       const arr = income.filter((item) => item.level == 1);
       setIncome2(arr);
@@ -112,10 +155,19 @@ export default function Home() {
   }, [team])
 
   useEffect(() => {
+    if (levelNode.length > 0) {
+      const arr = levelNode.filter((item) => item._type == 'level_roi')
+      setLevelNode2(arr)
+    }
+
+  }, [levelNode])
+
+  useEffect(() => {
     const value = ltRateINR / ltRateUSDT
     // console.log(value, "Value")
     setbdtPrice(value)
   }, [ltRateINR, ltRateUSDT]);
+
   const ref_addr = window.location.href;
   const reflink = useRef();
 
@@ -148,6 +200,7 @@ export default function Home() {
       setTotalWithdraw(d?.withdraw ?? 0);
     }).catch(e => console.log(e));
   }, []);
+
   let j = 2;
   const requiredmembercolumn = [
     {
@@ -293,7 +346,7 @@ export default function Home() {
     },
     {
       name: "Income Type",
-      selector: (row) => row._for == "direct_sponcer" ? "Sponsor Income" : "Stair Income",
+      selector: (row) => row._for == "direct_sponcer" ? "Sponsor Income" : row._for == "reward_income" ? "Star Income" : "Stair Income",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -391,6 +444,79 @@ export default function Home() {
     },
   ];
 
+  const noderewardcolumn = [
+    {
+      name: "SR No.",
+      selector: (row, i) => i + 1,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
+    },
+    {
+      name: "User",
+      selector: (row) => row._sender,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
+    },
+    {
+      name: "Node Type",
+      selector: (row) => row._type == "level_roi" ? "Stair Node " : "Sponsor Node",
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+    {
+      name: "Monthly Roi",
+      selector: (row) => row._type == "level_roi" ? "3% " : "2%",
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+    {
+      name: "Timestamp",
+      selector: (row) => new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+    {
+      name: "Transaction Id",
+      selector: (row) => (
+        <a
+          href={`https://explorer.bdltscan.io/tx/${row.transaction_id}/internal-transactions`}
+          target="_blank"
+          style={{ color: "white", textDecoration: "none" }}
+
+        >
+          {
+            row.transaction_id
+              ? row.transaction_id.substr(0, 10) +
+              "......." +
+              row.transaction_id.substr((row.transaction_id).length - 10, (row.transaction_id).length)
+              : "--"}
+          <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
+
+        </a>
+      ),
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+  ];
+
   const customStyles = {
     rows: {
       style: {
@@ -434,10 +560,27 @@ export default function Home() {
                 ? Math.round((Number(d.roi) / 1e18) * 1000000000) / 1000000000
                 : 0
             );
+            setStackingReward(
+              d.data.rewardIncome ? Math.round((Number(d.data.rewardIncome) / 1e18) * 1000000000) / 1000000000 : 0
+            );
+            setDirectSponsorRoi(
+              d.direct_roi ? Math.round((Number(d.direct_roi) / 1e18) * 1000000000) / 1000000000 : 0
+            );
+            setSelfNodeRoi(
+              d.self_roi ? Math.round((Number(d.self_roi) / 1e18) * 1000000000) / 1000000000 : 0
+            );
+            setNodeby(
+              d.data.isNodebuy
+            );
+
+            setNodeLevelRoi(
+              d.data.node.stairIncome ? Math.round((Number(d.data.node.stairIncome) / 1e18) * 1000000000) / 1000000000 : 0
+            );
             setRefferer(d.data.referrer);
             console.log("Royalty Wallet :: ", d.result[0].royalty_wallet)
             setRoyaltyWallet(d.result[0].royalty_wallet);
             setjoinAmount(d.data.joiningAmt);
+
             setDirectSponcer(d.data.partnersCount);
             setWithdrawAmt(
               d.data.withdrawn ? round(Number(d.data.withdrawn) / 1e18) + d.withdraw : 0
@@ -465,9 +608,17 @@ export default function Home() {
         console.log(e);
       });
       getIncome(wallet_address).then((ss) => {
-        // console.log(ss, "ammm")
+
         if (ss) {
           setIncome(ss.result);
+        }
+      }).catch((e) => {
+        console.log(e);
+      });
+      getLevelSponsor(wallet_address).then((ss) => {
+
+        if (ss) {
+          setLevelNode(ss.data);
         }
       }).catch((e) => {
         console.log(e);
@@ -481,6 +632,8 @@ export default function Home() {
         console.log(e);
       });
     }
+
+    // nodeJoiningAmount()
   }, [wallet_address, reflect]);
 
   function toFixed(x) {
@@ -505,63 +658,64 @@ export default function Home() {
     setspin("spinner-border spinner-border-sm");
     // balance >= joinAmount
     if (balance >= joinAmount) {
-      console.log("refferal Id::", ref_id1, joinAmount);
-      contract.methods
-        .isUserExists(wallet_address)
-        .call()
-        .then((is_exist) => {
-          if (!is_exist) {
-            contract.methods
-              .idToAddress(ref_id1)
-              .call()
-              .then((d) => {
-                console.log("Refferal Address ::", d);
-                if (d !== "0x0000000000000000000000000000000000000000") {
-                  contract.methods
-                    .registrationExt(d)
-                    .send({
-                      from: wallet_address,
-                      value: joiningPackage,
-                      // value: 0,
-                    })
-                    .then((d) => {
-                      setspin("");
-                      setdisable(false);
-                      setReflect(!reflect);
-                    })
-                    .catch((e) => {
-                      console.log("Error :: ", e);
-                      setspin("");
-                      setdisable(false);
-                      setReflect(!reflect);
-                    });
-                } else {
-                  NotificationManager.error(
-                    "Refferal Not Exist",
-                    "Invalid Referrel"
-                  );
-                  setspin("");
-                  setdisable(false);
-                  setReflect(!reflect);
-                }
-              })
-              .catch((e) => {
-                console.log("Error:: ", e);
+    console.log("refferal Id::", ref_id1, joinAmount);
+    contract.methods
+      .isUserExists(wallet_address)
+      .call()
+      .then((is_exist) => {
+        if (!is_exist) {
+          contract.methods
+            .idToAddress(ref_id1)
+            .call()
+            .then((d) => {
+              console.log("Refferal Address ::", d);
+              if (d !== "0x0000000000000000000000000000000000000000") {
+                contract.methods
+                  .registrationExt(wallet_address, d)
+                  .send({
+                    from: wallet_address,
+                    value: joiningPackage,
+                    // value: 0,
+                  })
+                  .then((d) => {
+                    setspin("");
+                    setdisable(false);
+                    setReflect(!reflect);
+                  })
+                  .catch((e) => {
+                    console.log("Error :: ", e);
+                    setspin("");
+                    setdisable(false);
+                    setReflect(!reflect);
+                  });
+              } else {
+                NotificationManager.error(
+                  "Refferal Not Exist",
+                  "Invalid Referrel"
+                );
                 setspin("");
                 setdisable(false);
-              });
-          } else {
-            NotificationManager.error("user already Join", "Already Exist");
-            setspin("");
-            setdisable(false);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
+                setReflect(!reflect);
+              }
+            })
+            .catch((e) => {
+              console.log("Error:: ", e);
+              setspin("");
+              setdisable(false);
+            });
+        } else {
+          NotificationManager.error("user already Join", "Already Exist");
           setspin("");
           setdisable(false);
-        });
-    } else {
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        setspin("");
+        setdisable(false);
+      });
+    }
+    else {
       NotificationManager.error("Low Balance ", "Error");
       setspin("");
       setdisable(false);
@@ -644,26 +798,127 @@ export default function Home() {
         });
     }
   }
+  async function onNodeRoiWithdraw() {
+    if (viewmodeflag) {
+      NotificationManager.info(
+        "Withdraw is not available in view mode!"
+      );
+    } else {
+      setspin3("spinner-border spinner-border-sm");
+      contract?.methods
+        ?.getNodeRewardWithdraw()
+        .send({ from: wallet_address, value: 0 })
+        .then((d) => {
+          console.log("Data:", d);
+          setspin3("");
+          setReflect(!reflect);
+        })
+        .catch((e) => {
+          console.log("Error:: ", e);
+          setspin3("");
+          setReflect(!reflect);
+        });
+    }
+  }
+
+  async function onUpgradeNode() {
+    if (viewmodeflag) {
+      NotificationManager.info(
+        "Withdraw is not available in view mode!"
+      );
+    } else {
+      if (balance >= 50000) {
+      setspin3("spinner-border spinner-border-sm");
+      contract?.methods
+        ?.stakeNode(wallet_address)
+        .send({ from: wallet_address, value: "50000000000000000000000" })
+        .then((d) => {
+          console.log("Data:", d);
+          setspin3("");
+          setReflect(!reflect);
+        })
+        .catch((e) => {
+          console.log("Error:: ", e);
+          setspin3("");
+          setReflect(!reflect);
+        });
+      }else {
+        NotificationManager.error("Low Balance");
+      }
+    }
+  }
+
+  async function onUnstake() {
+    if (viewmodeflag) {
+      NotificationManager.info(
+        "Withdraw is not available in view mode!"
+      );
+    } else {
+      setspin3("spinner-border spinner-border-sm");
+      contract?.methods
+        ?.unstakeNode(wallet_address)
+        .send({ from: wallet_address, value: 0 })
+        .then((d) => {
+          console.log("Data:", d);
+          setspin3("");
+          setReflect(!reflect);
+        })
+        .catch((e) => {
+          console.log("Error:: ", e);
+          setspin3("");
+          setReflect(!reflect);
+        });
+    }
+  }
+
+  async function nodeJoiningAmount() {
+    if (viewmodeflag) {
+      NotificationManager.info(
+        "Withdraw is not available in view mode!"
+      );
+    } else {
+      setspin3("spinner-border spinner-border-sm");
+      contract?.methods
+        ?.nodejoiningamt()
+        .call()
+        .then((d) => {
+          // console.log("Data: nodeJoin Amount", d);
+          // setnodeJoinAmount(d)
+          setspin3("");
+          setReflect(!reflect);
+        })
+        .catch((e) => {
+          console.log("Error:: ", e);
+          setspin3("");
+          setReflect(!reflect);
+        });
+    }
+  }
+
+  // console.log(timer, "timertimer tdfdjf")
+
+  const time = new Date(1646975640 * 1000);
+  time.setSeconds(time.getSeconds() + 3.156e+7)
 
   return (
     <>
       <div class="container">
-          <div class="ticker">
-           {/*  <div class="title">
+        <div class="ticker">
+          {/*  <div class="title">
               <h5>Offer</h5>
             </div> */}
-      
-            <div class="news">
-              <marquee class="news-content">
-                Learning development program(LDP)
-                Qualify criteria- Direct 10 Members or 1st to 4th level qualified
-                Max Members- First 150 team Members only
-                Time period- 1March -31March
-                LDP duration- 3days 2 night
-              </marquee>
-            </div>
+
+          <div class="news">
+            <marquee class="news-content">
+              Learning development program(LDP)
+              Qualify criteria- Direct 10 Members or 1st to 4th level qualified
+              Max Members- First 150 team Members only
+              Time period- 1March -31March
+              LDP duration- 3days 2 night
+            </marquee>
           </div>
         </div>
+      </div>
       <div className="container text-center mt-4">
         <div className="row">
           <div
@@ -720,7 +975,7 @@ export default function Home() {
         </div>
       </section>
       <section>
-      
+
         <div className="container">
           <div className="row cus_row">
             <div className="col-md-4 col-sm-6 col-6">
@@ -748,30 +1003,25 @@ export default function Home() {
       <section className="pb_50">
         <div className="container">
           <div className="row cus_row">
-            <div className="col-md-3 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-3 col-6">
               <div className="Personal_Details_inner">
                 <h4>Total Community Member</h4>
                 <h5>{total_member}+</h5>
               </div>
             </div>
-            <div className="col-md-3 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-3 col-6">
               <div className="Personal_Details_inner">
                 <h4> Total Staking </h4>
                 <h5>{round(total_investment)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-3 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-3 col-6">
               <div className="Personal_Details_inner">
                 <h4> Total Withdrawal Distributed</h4>
                 <h5>{round(total_withdraw)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-3 col-sm-3 col-6">
-              <div className="Personal_Details_inner">
-                <h4>BDLT Price </h4>
-                <h5>$ {bdtprice ? bdtprice.toFixed(3) : 0}</h5>
-              </div>
-            </div>
+
 
           </div>
         </div>
@@ -843,7 +1093,7 @@ export default function Home() {
                 >
                   Wallet Balance: {" " + balance + " "} BDLT
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Joining Package{" "}
-                  {": " + parseInt(joiningPackage / 1e18)} BDLT ($ 100)
+                  {": " + parseInt(joiningPackage / 1e18)} BDLT
                 </div>
                 <div className="col-md-8 col-lg-8 col-sm-8">
                   <div className="form-group">
@@ -963,12 +1213,61 @@ export default function Home() {
                   : (
                     <></>
                   )}
-                <button className="grad_btn btn-block mx-4 mt-5"> Upgrade Node</button>
               </div>
+              {
+
+                nodeBy == false ? (<>
+                  <div className="row cus_row ">
+                    <div className="col-md-4 col-sm-12 col-lg-6 mx-auto">
+                      <div className="Personal_Details_inner Personal_bg">
+                        <div className="row ">
+                          <div className="col-4 col-md-4 mx-auto">
+                            <h4>Node Buy Amount</h4>
+                            <h5>50000 BDLT</h5>
+                          </div>
+                        </div>
+                        <button className="grad_btn my-3" onClick={onUpgradeNode}>
+                          Stake Node
+                        </button>
+                      </div>
+                    </div>
+                  </div></>
+                ) : (
+                  <>
+                    <div className="row cus_row ">
+                      <div className="col-md-4 col-sm-12 col-lg-6 mx-auto">
+                        <div className="Personal_Details_inner Personal_bg">
+                          <div className="row ">
+                            <div className="col-4 col-md-4 mx-auto">
+                              <h4>Node Staked Amount</h4>
+                              <h5>50000 BDLT</h5>
+                            </div>
+                          </div>
+                          {/*  {isUnstake ? null :
+                            <MyTimer expiryTimestamp={time} /> 
+                          }
+                          {isUnstake ?
+                            < button className="grad_btn my-3" onClick={onUnstake}>
+                              Unstake
+                            </button>
+                            : null} */}
+                          < button className="grad_btn my-3" onClick={onUnstake}>
+                            Unstake
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )
+              }
+
+
+
             </div>
           </div>
         </section>
-      )}
+      )
+      }
 
       <section className="pb_50">
         <div className="container">
@@ -1003,28 +1302,30 @@ export default function Home() {
           <div className="row cus_row">
             <div className="col-md-4 col-sm-4 col-6">
               <div className="Personal_Details_inner">
-                <h4>Direct Sponsor Income</h4>
+                <h4>Direct Sponsor Reward</h4>
                 <h5>{(directIncome).toFixed(2)} BDLT</h5>
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-6">
               <div className="Personal_Details_inner">
-                <h4>Stair Income</h4>
+                <h4>Stair Reward</h4>
                 <h5>{(levelIncome).toFixed(2)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-4 col-sm-4 col-12">
+            <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner">
-                <h4>Total Available Income</h4>
-                <h5>{round((roi ? Number(roi).toFixed(2) : 0) + (royaltyWallet ? Number(royaltyWallet).toFixed(2) : 0))} BDLT</h5>
+                <h4>Star Reward</h4>
+                <h5>{stackingReward ? Number(stackingReward).toFixed(2) : 0} BDLT</h5>
               </div>
             </div>
+
+
           </div>
           {/* Third row */}
           <div className="row cus_row">
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
-                <h4>Total Income</h4>
+                <h4>Total Reward</h4>
                 <h5>{round((roi ? Number(roi) : 0) + (royaltyWallet ? Number(royaltyWallet) : 0) + Number(withdrawalAmt)).toFixed(2)} BDLT</h5>
               </div>
             </div>
@@ -1034,34 +1335,45 @@ export default function Home() {
                 <h5>{round(withdrawalAmt ? Number(withdrawalAmt).toFixed(2) : 0)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-4 col-sm-4 col-lg-4">
+            <div className="col-md-4 col-sm-4 col-12">
               <div className="Personal_Details_inner">
-                <h4>Stacking Rewards</h4>
-                <h5>{0} BDLT</h5>
+                <h4>Total Available Reward</h4>
+                <h5>{round((roi ? Number(roi).toFixed(2) : 0) + (royaltyWallet ? Number(royaltyWallet).toFixed(2) : 0))} BDLT</h5>
               </div>
             </div>
           </div>
           {/* fourth row*/}
           <div className="row cus_row">
-            <div className="col-md-3 col-sm-3 col-lg-3">
+            <div className="col-4 col-md-4">
               <div className="Personal_Details_inner Personal_bg">
-                <h4>Roi Income</h4>
+                <h4>Node Stair Reward</h4>
+                <h5>{(nodeLevelRoi ? Number(nodeLevelRoi).toFixed(2) : 0)} BDLT</h5>
+                <button className="grad_btn my-2" style={{visibility:"hidden"}}>
+                  Withdraw 
+                </button>
+              </div>
+
+            </div>
+
+            <div className="col-md-4 col-sm-4 col-lg-4">
+              <div className="Personal_Details_inner Personal_bg">
+                <h4>Roi Reward</h4>
                 <h5>{Number(roi).toFixed(2)} BDLT</h5>
                 <button className="grad_btn my-2" onClick={onWithdraw}>
                   Withdraw Roi
                 </button>
               </div>
             </div>
-            <div className="col-md-3 col-sm-3 col-lg-3">
+            <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
-                <h4>Royalty Income</h4>
+                <h4>Royalty Reward</h4>
                 <h5>{royaltyWallet ? royaltyWallet : 0} BDLT</h5>
                 <button className="grad_btn my-2" onClick={onRoyaltyWithdraw}>
                   Withdraw Royalty
                 </button>
               </div>
             </div>
-            <div className="col-md-3 col-sm-3 col-lg-3">
+            {/*  <div className="col-md-3 col-sm-3 col-lg-3">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Self Node ROI</h4>
                 <h5>{0} BDLT</h5>
@@ -1069,8 +1381,8 @@ export default function Home() {
                   Withdraw Roi
                 </button>
               </div>
-            </div>
-            <div className="col-md-3 col-sm-3 col-lg-3">
+            </div> */}
+            {/* <div className="col-md-3 col-sm-3 col-lg-3">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Direct Sponsor ROI</h4>
                 <h5>{0} BDLT</h5>
@@ -1078,17 +1390,70 @@ export default function Home() {
                   Withdraw Roi
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="row cus_row">
             <div className="col-md-12 col-sm-12 col-lg-12">
               <div className="Personal_Details_inner Personal_bg">
-                <h4>Node Level ROI</h4>
-                <h5>{0} BDLT</h5>
-                <button className="grad_btn my-2" onClick={onWithdraw}>
-                  Withdraw Roi
+                <div className="row ">
+                  <div className="col-6 col-md-6">
+                    <h4>Self Node ROS</h4>
+                    <h5>{selfNodeRoi ? Number(selfNodeRoi).toString() : 0} BDLT</h5>
+                  </div>
+                  <div className="col-6 col-md-6">
+                    <h4>Direct Sponsor ROS</h4>
+                    <h5>{directSponsorRoi ? Number(directSponsorRoi).toFixed(2) : 0} BDLT</h5>
+                  </div>
+                </div>
+                <button className="grad_btn my-3" onClick={onNodeRoiWithdraw}>
+                  Withdraw
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="pb_50">
+        <div className="container">
+          <div className="all_heading text-center">
+            <h2>
+              <span>Team Members</span>
+            </h2>
+          </div>
+          <div className="sm_container">
+            <select style={{ color: "white", backgroundColor: "black", border: "none", width: "100px" }}
+              value={selectedlevelTeam ? selectedlevelTeam : 'Level 1'}
+              onChange={(e) => {
+                setSelectedLevelTeam(e.target.value);
+              }}>
+              {
+                levels.map((data, index) => {
+                  return (
+                    <option value={data} key={index}>{data}</option>
+                  )
+                })
+              }
+
+            </select>
+            <div className="table_inner">
+              <div className="table-responsive gridtable">
+
+                <DataTable
+                  columns={teamcolumn}
+                  data={
+                    team2 ? team2.length > 0
+                      ? team2
+                      : [] : []
+                  }
+                  pagination
+                  paginationPerPage={4}
+                  progressPending={false}
+                  customStyles={customStyles}
+                />
+
               </div>
             </div>
           </div>
@@ -1126,49 +1491,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="pb_50">
-        <div className="container">
-          <div className="all_heading text-center">
-            <h2>
-              <span>Team Members</span>
-            </h2>
-          </div>
-          <div className="sm_container">
-            <select style={{ color: "white", backgroundColor: "black", border: "none" }}
-              value={selectedlevelTeam ? selectedlevelTeam : 'Level 1'}
-              onChange={(e) => {
-                setSelectedLevelTeam(e.target.value);
-              }}>
-              {
-                levels.map((data, index) => {
-                  return (
-                    <option value={data} key={index}>{data}</option>
-                  )
-                })
-              }
 
-            </select>
-            <div className="table_inner">
-              <div className="table-responsive gridtable">
-
-                <DataTable
-                  columns={teamcolumn}
-                  data={
-                    team2 ? team2.length > 0
-                      ? team2
-                      : [] : []
-                  }
-                  pagination
-                  paginationPerPage={4}
-                  progressPending={false}
-                  customStyles={customStyles}
-                />
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
 
 
@@ -1180,7 +1503,7 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container">
-            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px" }}
+            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px", width: "100px" }}
               value={selectedlevel ? selectedlevel : 'Level 1'}
               onChange={(e) => {
                 console.log("selected level::", e.target.value);
@@ -1197,13 +1520,13 @@ export default function Home() {
             </select>
 
             <select className="px-2" style={{ color: "white", backgroundColor: "black", border: "none" }}
-              value={selectedlevel ? selectedlevel : ''}
-              /* onChange={(e) => {
-                console.log("selected level::", e.target.value);
-                setSelectedLevel(e.target.value);
-              }} */>
+              value={selectedIncome}
+              onChange={(e) => {
+                setSelectedIncome(e.target.value);
+              }} >
+              <option>Select IncomeType</option>
               {
-                incomeType.map((data, index) => {
+                incometype.map((data, index) => {
                   return (
 
                     <option value={data} key={index}>{data}</option>
@@ -1236,7 +1559,7 @@ export default function Home() {
         <div className="container">
           <div className="all_heading text-center">
             <h2>
-              <span>Withdrawal History</span>
+              <span>Withdraw History</span>
             </h2>
           </div>
           <div className="sm_container text-light">
@@ -1262,42 +1585,31 @@ export default function Home() {
         <div className="container">
           <div className="all_heading text-center">
             <h2>
-              <span>Direct Sponsor Node</span>
+              <span>Node Reward</span>
             </h2>
           </div>
           <div className="sm_container text-light">
+            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px", width: "150px" }}
+              // value={selectedNode ? selectedNode : 'Sponsor Node'}
+              onChange={(e) => {
+                console.log("selected level::", e.target.value);
+                setSelectedLevel(e.target.value);
+              }}>
+              {
+                nodeType.map((data, index) => {
+                  return (
+
+                    <option value={data} key={index}>{data}</option>
+                  )
+                })
+              }
+            </select>
             <div className="table_inner">
               <div className="table-responsive gridtable">
 
                 <DataTable
-                  columns={withdrawcolumn}
-                  data={withdraw ? withdraw : []}
-                  pagination
-                  paginationPerPage={4}
-                  progressPending={false}
-                  customStyles={customStyles}
-                />
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb_50 text-light">
-        <div className="container">
-          <div className="all_heading text-center">
-            <h2>
-              <span>Level Sponsor Node</span>
-            </h2>
-          </div>
-          <div className="sm_container text-light">
-            <div className="table_inner">
-              <div className="table-responsive gridtable">
-
-                <DataTable
-                  columns={withdrawcolumn}
-                  data={withdraw ? withdraw : []}
+                  columns={noderewardcolumn}
+                  data={levelNode ? levelNode : []}
                   pagination
                   paginationPerPage={4}
                   progressPending={false}
