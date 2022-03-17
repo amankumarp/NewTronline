@@ -1358,10 +1358,10 @@ export default function Home() {
 
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
-                <h4>Roi Reward</h4>
+                <h4>ROS Reward</h4>
                 <h5>{Number(roi).toFixed(2)} BDLT</h5>
                 <button className="grad_btn my-2" onClick={onWithdraw}>
-                  Withdraw Roi
+                  Withdraw ROS
                 </button>
               </div>
             </div>
