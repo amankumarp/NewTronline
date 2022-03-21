@@ -68,7 +68,7 @@ export default function Home() {
   const [selectedNode, setSelectedNode] = useState([])
   const [nodetabType, setNodeTabType] = useState([])
   const [levelNode2, setLevelNode2] = useState([])
-
+  const [oldRoi ,setOldRoi] =useState(0);
 
 
   const levels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9', 'Level 10', 'Level 11', 'Level 12', 'Level 13', 'Level 14', 'Level 15', 'Level 16', 'Level 17', 'Level 18', 'Level 19', 'Level 20', 'Level 21', 'Level 22', 'Level 23', 'Level 24', 'Level 25', 'Level 26', 'Level 27', 'Level 28', 'Level 29', 'Level 30', 'Level 31', 'Level 32', 'Level 33', 'Level 34', 'Level 35', 'Level 36', 'Level 37', 'Level 38', 'Level 39', 'Level 40']
@@ -552,6 +552,8 @@ export default function Home() {
                 ? round(Number(d.data.sponcerIncome) / 1e18)
                 : 0
             );
+            setOldRoi(d.user[0].old_roi? round(Number(d.user[0].old_roi) / 1e18)
+            : 0);
             setLevelIncome(
               d.data.levelIncome ? round(Number(d.data.levelIncome) / 1e18) : 0
             );
@@ -902,14 +904,14 @@ export default function Home() {
 
   return (
     <>
-      <div class="container">
-        <div class="ticker">
-          {/*  <div class="title">
+      <div className="container">
+        <div className="ticker">
+          {/*  <div className="title">
               <h5>Offer</h5>
             </div> */}
 
-          <div class="news">
-            <marquee class="news-content">
+          <div className="news">
+            <marquee className="news-content">
               Learning development program(LDP)
               Qualify criteria- Direct 10 Members or 1st to 4th level qualified
               Max Members- First 150 team Members only
@@ -937,8 +939,8 @@ export default function Home() {
                 className="col-md-6 col-lg-6 col-sm-12 asm d-flex justify-content-center"
                 style={{ flexDirection: "column" }}
               >
-                <a class="grad_btn btn-block text-light my-2" style={{ fontSize: "0.875rem" }} onClick={() => window.addNetwork("web3")}>
-                  <img class="mr-1" width={24} src="https://bscscan.com/images/svg/brands/metamask.svg" alt="Metamask" /> Add to Metamask
+                <a className="grad_btn btn-block text-light my-2" style={{ fontSize: "0.875rem" }} onClick={() => window.addNetwork("web3")}>
+                  <img className="mr-1" width={24} src="https://bscscan.com/images/svg/brands/metamask.svg" alt="Metamask" /> Add to Metamask
                 </a>
 
               </div>
@@ -997,32 +999,24 @@ export default function Home() {
                 <h5>{price}</h5>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-      <section className="pb_50">
-        <div className="container">
-          <div className="row cus_row">
-            <div className="col-md-4 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4>Total Community Member</h4>
                 <h5>{total_member}+</h5>
               </div>
             </div>
-            <div className="col-md-4 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4> Total Staking </h4>
                 <h5>{round(total_investment)} BDLT</h5>
               </div>
             </div>
-            <div className="col-md-4 col-sm-3 col-6">
+            <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4> Total Withdrawal Distributed</h4>
                 <h5>{round(total_withdraw)} BDLT</h5>
               </div>
             </div>
-
-
           </div>
         </div>
       </section>
@@ -1219,10 +1213,10 @@ export default function Home() {
 
                 nodeBy == false ? (<>
                   <div className="row cus_row ">
-                    <div className="col-md-4 col-sm-12 col-lg-6 mx-auto">
+                    <div className="col-md-6 col-sm-12 col-lg-6 mx-auto">
                       <div className="Personal_Details_inner Personal_bg">
                         <div className="row ">
-                          <div className="col-4 col-md-4 mx-auto">
+                          <div className="col-4 col-md-6 mx-auto">
                             <h4>Node Buy Amount</h4>
                             <h5>50000 BDLT</h5>
                           </div>
@@ -1236,10 +1230,10 @@ export default function Home() {
                 ) : (
                   <>
                     <div className="row cus_row ">
-                      <div className="col-md-4 col-sm-12 col-lg-6 mx-auto">
+                      <div className="col-md-6 col-sm-12 col-lg-6 mx-auto">
                         <div className="Personal_Details_inner Personal_bg">
                           <div className="row ">
-                            <div className="col-4 col-md-4 mx-auto">
+                            <div className="col-4 col-md-6 mx-auto">
                               <h4>Node Staked Amount</h4>
                               <h5>50000 BDLT</h5>
                             </div>
@@ -1345,7 +1339,7 @@ export default function Home() {
           </div>
           {/* fourth row*/}
           <div className="row cus_row">
-            <div className="col-4 col-md-4">
+            <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Node Stair Reward</h4>
                 <h5>{(nodeLevelRoi ? Number(nodeLevelRoi).toFixed(2) : 0)} BDLT</h5>
@@ -1395,12 +1389,24 @@ export default function Home() {
           </div>
 
           <div className="row cus_row">
-            <div className="col-md-12 col-sm-12 col-lg-12">
+            <div className="col-md-4 col-sm-4 col-lg-4">
+            <div className="Personal_Details_inner Personal_bg">
+                <div className="row ">
+                    <h4>Remaining ROS (Old Contract)</h4>
+                    <h5>{oldRoi ? Number(oldRoi).toString() : 0} BDLT</h5>
+                  </div>
+                  <button className="grad_btn my-3" disabled={true}>
+                  Withdraw
+                </button> 
+                  </div>
+            </div>
+            <div className="col-md-8 col-sm-8 col-lg-8">
               <div className="Personal_Details_inner Personal_bg">
                 <div className="row ">
                   <div className="col-6 col-md-6">
                     <h4>Self Node ROS</h4>
                     <h5>{selfNodeRoi ? Number(selfNodeRoi).toString() : 0} BDLT</h5>
+                    
                   </div>
                   <div className="col-6 col-md-6"> 
                     <h4>Sponsor Node ROS</h4>
@@ -1682,8 +1688,8 @@ export default function Home() {
 
       <div>
         <footer>
-          <div class="container">
-            <div class="mt_20">
+          <div className="container">
+            <div className="mt_20">
               {/* <h2> TronLine</h2> */}
               <img
                 src="./img/logo-black.png"
@@ -1723,7 +1729,7 @@ export default function Home() {
                   Smart Contract info
                 </a>
                 <a
-                  class="grad_btn my-3 mt-4"
+                  className="grad_btn my-3 mt-4"
                   href="https://bdltcommunity.io/support/Login.php"
                   target="_blank"
                 >

@@ -92,7 +92,7 @@
 //             {row.transaction_id}
 //           </a>
 //         ) : (
-//           <span class="badge bg-warning text-dark p-2 px-4" style={{fontSize:"12px"}}>Pending</span>
+//           <span className="badge bg-warning text-dark p-2 px-4" style={{fontSize:"12px"}}>Pending</span>
 //         )}
 //       </div>
 //       ),
@@ -190,7 +190,7 @@
 //               {row.transaction_id}
 //             </a>
 //           ) : (
-//             <span class="badge bg-warning text-dark p-2 px-4" style={{fontSize:"12px"}}>Pending</span>
+//             <span className="badge bg-warning text-dark p-2 px-4" style={{fontSize:"12px"}}>Pending</span>
 //           )}
 //         </div>
 //       ),
@@ -492,15 +492,15 @@
 //         </div>
 //       </div>
 
-//       <section class="pb_50">
-//         <div class="container">
-//           <div class="all_heading text-center">
+//       <section className="pb_50">
+//         <div className="container">
+//           <div className="all_heading text-center">
 //             <h2>
 //               <span>My Community Rewards</span>
 //             </h2>
 //           </div>
-//           <div class="">
-//             <div class="table_inner">
+//           <div className="">
+//             <div className="table_inner">
 //               <DataTable
 //                 columns={updowncoloumns}
 //                 data={state.all_up_down_income}
@@ -514,15 +514,15 @@
 //         </div>
 //       </section>
 
-//       <section class="pb_50 mb-5">
-//         <div class="container">
-//           <div class="all_heading text-center">
+//       <section className="pb_50 mb-5">
+//         <div className="container">
+//           <div className="all_heading text-center">
 //             <h2>
 //               <span>My Directs</span>
 //             </h2>
 //           </div>
-//           <div class="">
-//             <div class="table_inner">
+//           <div className="">
+//             <div className="table_inner">
 //               <DataTable
 //                 columns={directcolumns}
 //                 data={state.mydirect}
@@ -536,15 +536,15 @@
 //         </div>
 //       </section>
 
-//       <section class="pb_50">
-//         <div class="container">
-//           <div class="all_heading text-center">
+//       <section className="pb_50">
+//         <div className="container">
+//           <div className="all_heading text-center">
 //             <h2>
 //               <span>My Withdraw </span>
 //             </h2>
 //           </div>
-//           <div class="">
-//             <div class="table_inner">
+//           <div className="">
+//             <div className="table_inner">
 //               <DataTable
 //                 columns={mywithdrawcolumns}
 //                 data={state.withdrawal_history}
@@ -558,15 +558,15 @@
 //         </div>
 //       </section>
 
-//       <section class="pb_50">
-//         <div class="container">
-//           <div class="all_heading text-center">
+//       <section className="pb_50">
+//         <div className="container">
+//           <div className="all_heading text-center">
 //             <h2>
 //               <span>VIP Sponsor Rewards</span>
 //             </h2>
 //           </div>
-//           <div class="">
-//             <div class="table_inner">
+//           <div className="">
+//             <div className="table_inner">
 //               <DataTable
 //                 columns={sponcercolumns}
 //                 data={myvipsponsor}
@@ -580,15 +580,15 @@
 //         </div>
 //       </section>
 
-//       <section class="pb_50 mb-5">
-//         <div class="container">
-//           <div class="all_heading text-center">
+//       <section className="pb_50 mb-5">
+//         <div className="container">
+//           <div className="all_heading text-center">
 //             <h2>
 //               <span>VIP Withdraw History</span>
 //             </h2>
 //           </div>
-//           <div class="">
-//             <div class="table_inner">
+//           <div className="">
+//             <div className="table_inner">
 //               <DataTable
 //                 columns={vipwithdrawcolumns}
 //                 data={state.vip_withdrawal_history}
@@ -604,8 +604,8 @@
 
 //       <div>
 //         <footer>
-//           <div class="container">
-//             <div class="mt_20">
+//           <div className="container">
+//             <div className="mt_20">
 //               {/* <h2> TronLine</h2> */}
 //               <img
 //                 src="./img/tronline.png"
@@ -645,7 +645,7 @@
 //                   Smart Contract info
 //                 </a>
 //                 {/* <a
-//                   class="grad_btn my-3 mt-4"
+//                   className="grad_btn my-3 mt-4"
 //                   href="https://support.tronline.io/"
 //                   target="_blank"
 //                 >
