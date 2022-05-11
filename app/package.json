@@ -8,9 +8,11 @@
         "@testing-library/user-event": "^12.8.3",
         "@walletconnect/web3-provider": "^1.7.1",
         "axios": "^0.24.0",
+        "formik": "^2.2.9",
         "jquery": "^3.6.0",
         "nodemon": "^2.0.15",
         "react": "^17.0.2",
+        "react-bootstrap": "^2.2.3",
         "react-data-table-component": "^7.4.7",
         "react-data-table-component-extensions": "^1.5.2",
         "react-dom": "^17.0.2",
@@ -29,11 +31,12 @@
         "timer-node": "^5.0.5",
         "web-vitals": "^1.1.2",
         "web3": "^1.7.0",
-        "web3modal": "^1.9.5"
+        "web3modal": "^1.9.5",
+        "yup": "^0.32.11"
     },
     "scripts": {
-        "start": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
-        "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+        "start": "react-scripts start",
+        "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },

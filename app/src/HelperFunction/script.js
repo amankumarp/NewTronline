@@ -50,6 +50,22 @@ export const getUserInfo = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+export const getLdpInfo = (waddress, name, mobile, adhaar, address) => {
+    return fetch(`${url}/apply-for-ldp`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user: waddress,
+                name: name,
+                mobile: mobile,
+                adhaar: adhaar,
+                address: address
+            })
+        }).then(d => d.json())
+        .catch(e => e)
+}
 
 export const getIncome = (user) => {
         return fetch(`${url}/income`, {
@@ -89,6 +105,19 @@ export const getWithdraw = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+export const getRoyalityHistory = (user) => {
+    return fetch(`${url}/withdraw-history`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user: user,
+            })
+        }).then(d => d.json())
+        .catch(e => e)
+}
+
 export const royaltyWithdraw = (user) => {
     return fetch(`${url}/royaltyWithdraw`, {
             method: "POST",

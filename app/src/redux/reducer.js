@@ -2,8 +2,8 @@ import {
     SET_ADDRESS,
     SET_LOGGEDIN,
     TOTAL_BALANCE,
-    WALLET_INCOME,
-    VIP_INCOME,
+    SET_JOIN_PACKAGE,
+    SET_CONTRACT_ADDRESS,
     UPLINE_INCOME,
     DOWNLINE_INCOME,
     SPONSOR_INCOME,
@@ -21,11 +21,11 @@ import {
 } from "./constant";
 
 const initialState = {
-    wallet_address: "",
+    Waddress: "",
     isLoggedIn: false,
-    balance: 0,
-    wallet_income: 0,
-    vip_income: {},
+    wallet_balance: 0,
+    joinPackage: 0,
+    contractAddress: "",
     vip_income_withdrawn: 0,
     upline: 0,
     downline: 0,
@@ -54,7 +54,7 @@ const appStore = (state = initialState, action) => {
         case SET_ADDRESS:
             return {
                 ...state,
-                wallet_address: action.data,
+                Waddress: action.data,
             };
 
         case SET_LOGGEDIN:
@@ -66,22 +66,22 @@ const appStore = (state = initialState, action) => {
         case TOTAL_BALANCE:
             return {
                 ...state,
-                balance: action.data,
+                wallet_balance: action.data,
             };
-        case WALLET_INCOME:
+        case SET_JOIN_PACKAGE:
             return {
                 ...state,
-                wallet_income: action.data,
+                joinPackage: action.data,
             };
         case SET_PERSONAL_DETAILS:
             return {
                 ...state,
                 personaldetails: action.data,
             };
-        case VIP_INCOME:
+        case SET_CONTRACT_ADDRESS:
             return {
                 ...state,
-                vip_income: action.data,
+                contractAddress: action.data,
             };
         case VIP_INCOME_WITHDRAWN:
             return {

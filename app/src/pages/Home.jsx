@@ -2,19 +2,50 @@ import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import { NotificationManager } from "react-notifications";
 import { BiSupport } from "react-icons/bi";
-import { useSelector } from "react-redux";
-import { BsTelegram, BsWhatsapp, BsFacebook, BsInstagram, } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  BsTelegram,
+  BsWhatsapp,
+  BsFacebook,
+  BsInstagram,
+} from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
-import DataTableExtensions from 'react-data-table-component-extensions';
-import 'react-data-table-component-extensions/dist/index.css';
-import '../index.css'
-import axios from 'axios'
-import 'react-dropdown/style.css';
-import { IoChatbubbleOutline } from 'react-icons/all'
+import DataTableExtensions from "react-data-table-component-extensions";
+import "react-data-table-component-extensions/dist/index.css";
+import "../index.css";
+import axios from "axios";
+import "react-dropdown/style.css";
+import { AiFillStar } from "react-icons/all";
 import MyTimer from "../Component/Timer";
+// import FormModal from "../Component/FormModal";
+import { Modal, Button, Form } from "react-bootstrap";
+import { Formik, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import TeamMember from "./TeamMember";
 
-import { CONTRACT_ADDRESS } from "../HelperFunction/config"
-import { getIncome, getTeam, getUserInfo, getWithdraw, onConnect, royaltyWithdraw, userIdByWallet, globalStat, getRequiredMembers, getLevelSponsor } from "../HelperFunction/script";
+import { CONTRACT_ADDRESS } from "../HelperFunction/config";
+import {
+  getIncome,
+  getTeam,
+  getUserInfo,
+  getWithdraw,
+  onConnect,
+  royaltyWithdraw,
+  userIdByWallet,
+  globalStat,
+  getRequiredMembers,
+  getLevelSponsor,
+  getRoyalityHistory,
+  getLdpInfo,
+} from "../HelperFunction/script";
+import { Link } from "react-router-dom";
+import {
+  SET_ADDRESS,
+  SET_CONTRACT_ADDRESS,
+  SET_JOIN_PACKAGE,
+  SET_LOGGEDIN,
+  TOTAL_BALANCE,
+} from "../redux/constant";
 
 export default function Home() {
   const { isUnstake } = useSelector((state) => state.appStore);
@@ -51,31 +82,99 @@ export default function Home() {
   const [viewmode, setViewMode] = useState(1);
   const [viewmodeflag, setViewModeFlag] = useState(0);
   const [smartBalance, setSmartBalance] = useState(0);
-  const [ltRateINR, setltRateINR] = useState(0)
-  const [ltRateUSDT, setLTRateUSDT] = useState(0)
-  const [bdtprice, setbdtPrice] = useState(0)
-  const [selectedlevel, setSelectedLevel] = useState('');
+  const [ltRateINR, setltRateINR] = useState(0);
+  const [ltRateUSDT, setLTRateUSDT] = useState(0);
+  const [bdtprice, setbdtPrice] = useState(0);
+  const [selectedlevel, setSelectedLevel] = useState("");
   const [income2, setIncome2] = useState([]);
   const [team2, setTeam2] = useState([]);
-  const [selectedlevelTeam, setSelectedLevelTeam] = useState('')
-  const [stackingReward, setStackingReward] = useState(0)
-  const [directSponsorRoi, setDirectSponsorRoi] = useState(0)
-  const [selfNodeRoi, setSelfNodeRoi] = useState(0)
-  const [nodeLevelRoi, setNodeLevelRoi] = useState(0)
-  const [levelNode, setLevelNode] = useState(0)
-  const [nodeBy, setNodeby] = useState(0)
-  const [selectedIncome, setSelectedIncome] = useState('')
-  const [selectedNode, setSelectedNode] = useState([])
-  const [nodetabType, setNodeTabType] = useState([])
-  const [levelNode2, setLevelNode2] = useState([])
-  const [oldRoi ,setOldRoi] =useState(0);
+  const [selectedlevelTeam, setSelectedLevelTeam] = useState("");
+  const [stackingReward, setStackingReward] = useState(0);
+  const [directSponsorRoi, setDirectSponsorRoi] = useState(0);
+  const [selfNodeRoi, setSelfNodeRoi] = useState(0);
+  const [nodeLevelRoi, setNodeLevelRoi] = useState(0);
+  const [levelNode, setLevelNode] = useState(0);
+  const [nodeBy, setNodeby] = useState(0);
+  const [selectedIncome, setSelectedIncome] = useState("");
+  const [selectedNode, setSelectedNode] = useState([]);
+  const [nodetabType, setNodeTabType] = useState([]);
+  const [levelNode2, setLevelNode2] = useState([]);
+  const [oldRoi, setOldRoi] = useState(0);
+  const [partnersCount, setPartnersCount] = useState("");
+  const [rewardStatus, setRewardStatus] = useState("");
+  const [royalityHistory, setRoyalityHistory] = useState([]);
+  const [royalityIncome, setRoyalityIncome] = useState([]);
+  const [ldp, setLdp] = useState("");
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [aadhaar, setAadhaar] = useState("");
+  const [address, setAddress] = useState("");
+  const [nameErr, setNameErr] = useState(false);
+  const [mobileErr, setMobileErr] = useState(false);
+  const [aadhaarErr, setAadhaarErr] = useState(false);
+  const [addressErr, setAddressErr] = useState(false);
+  const [sucModel, setSucModel] = useState();
+  const dispatch = useDispatch();
+  const levels = [
+    "Level 1",
+    "Level 2",
+    "Level 3",
+    "Level 4",
+    "Level 5",
+    "Level 6",
+    "Level 7",
+    "Level 8",
+    "Level 9",
+    "Level 10",
+    "Level 11",
+    "Level 12",
+    "Level 13",
+    "Level 14",
+    "Level 15",
+    "Level 16",
+    "Level 17",
+    "Level 18",
+    "Level 19",
+    "Level 20",
+    "Level 21",
+    "Level 22",
+    "Level 23",
+    "Level 24",
+    "Level 25",
+    "Level 26",
+    "Level 27",
+    "Level 28",
+    "Level 29",
+    "Level 30",
+    "Level 31",
+    "Level 32",
+    "Level 33",
+    "Level 34",
+    "Level 35",
+    "Level 36",
+    "Level 37",
+    "Level 38",
+    "Level 39",
+    "Level 40",
+  ];
+  const incometype = [
+    "Sponsor income",
+    "Stair Income",
+    "Star Income",
+    "Node Stair Income",
+  ];
+  const nodeType = ["Sponsor Node", "Stair Node"];
+  const { Waddress, isLoggedIn, wallet_balance, joinPackage, contractAddress } =
+    useSelector((state) => state.appStore);
+  /* const data2 = {
+    amount: "16128130000000000000000",
+    block_timestamp: "1649857620",
+    id: 4,
+    transaction_id:
+      "0xe6692d93491b6aa41df45687e5f16bde38ee3996c39856fd1f63cdfbba03916a",
+  }; */
 
-
-  const levels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 9', 'Level 10', 'Level 11', 'Level 12', 'Level 13', 'Level 14', 'Level 15', 'Level 16', 'Level 17', 'Level 18', 'Level 19', 'Level 20', 'Level 21', 'Level 22', 'Level 23', 'Level 24', 'Level 25', 'Level 26', 'Level 27', 'Level 28', 'Level 29', 'Level 30', 'Level 31', 'Level 32', 'Level 33', 'Level 34', 'Level 35', 'Level 36', 'Level 37', 'Level 38', 'Level 39', 'Level 40']
-  const incometype = ['Sponsor income', 'Stair Income', 'Star Income', "Node Stair Income"]
-  const nodeType = ['Sponsor Node', "Stair Node"]
-
-
+  // setRoylityHistory(data2)
 
   useEffect(() => {
     if (income.length > 0 && selectedlevel) {
@@ -88,59 +187,62 @@ export default function Home() {
   useEffect(() => {
     if (team.length > 0 && selectedlevelTeam) {
       const arr = team.filter((item) => item.level == selectedlevelTeam);
-      setTeam2(arr)
+      setTeam2(arr);
     }
-  }, [selectedlevelTeam])
+  }, [selectedlevelTeam]);
 
   useEffect(() => {
-    const itarr = ['reward_income', 'level_income', 'direct_sponcer', 'node_stair_income'];
+    const itarr = [
+      "reward_income",
+      "level_income",
+      "direct_sponcer",
+      "node_stair_income",
+    ];
     if (income.length > 0 && selectedIncome) {
-      // console.log(selectedIncome, "selected")
-      let it1 = '';
-      if (selectedIncome === 'Sponsor income') {
+      // console.log(selectedIncome, "selected income------------------")
+      let it1 = "";
+      if (selectedIncome === "Sponsor income") {
         it1 = itarr[2];
         const arr = income.filter((item) => item._for === it1);
-        console.log(it1, arr);
+        // console.log(it1, arr);
         setIncome2(arr);
-      } else if (selectedIncome === 'Stair Income') {
+      } else if (selectedIncome === "Stair Income") {
         it1 = itarr[1];
         const arr = income.filter((item) => item._for === it1);
-        console.log(it1, arr);
+        // console.log(it1, arr);
         setIncome2(arr);
-      }
-      else if (selectedIncome === 'Star Income') {
+      } else if (selectedIncome === "Star Income") {
         it1 = itarr[0];
         const arr = income.filter((item) => item._for === it1);
-        console.log(it1, arr);
+        // console.log(it1, arr);
         setIncome2(arr);
-      } else if (selectedIncome === 'Node Stair Income') {
+      } else if (selectedIncome === "Node Stair Income") {
         it1 = itarr[3];
         const arr = income.filter((item) => item._for === it1);
-        console.log(it1, arr);
+        // console.log(it1, arr);
         setIncome2(arr);
       } else {
         setIncome2(income);
       }
     }
-  }, [selectedIncome])
+  }, [selectedIncome]);
 
   useEffect(() => {
-    const nrr = ['level_roi', 'sponcer_roi'];
+    const nrr = ["level_roi", "sponcer_roi"];
     if (levelNode.length > 0 && selectedNode) {
-      let it2 = ''
-      if (selectedNode === 'Sponsor Node') {
-        it2 = nrr[1]
-      } else if (selectedNode === 'Stair Node') {
-        it2 = nrr[0]
+      let it2 = "";
+      if (selectedNode === "Sponsor Node") {
+        it2 = nrr[1];
+      } else if (selectedNode === "Stair Node") {
+        it2 = nrr[0];
       }
       console.log(it2, levelNode);
-      const arr = levelNode.filter((item) => item._type === it2)
+      const arr = levelNode.filter((item) => item._type === it2);
       setLevelNode2(arr);
     }
-  }, [selectedNode])
+  }, [selectedNode]);
 
   useEffect(() => {
-
     if (income.length > 0) {
       // const arr = income.filter((item) => item.level == 1);
       setIncome2(income);
@@ -149,23 +251,22 @@ export default function Home() {
 
   useEffect(() => {
     if (team.length > 0) {
-      const arr = team.filter((item) => item.level == 'Level 1');
+      const arr = team.filter((item) => item.level == "Level 1");
       setTeam2(arr);
     }
-  }, [team])
+  }, [team]);
 
   useEffect(() => {
     if (levelNode.length > 0) {
-      const arr = levelNode.filter((item) => item._type == 'level_roi')
-      setLevelNode2(arr)
+      const arr = levelNode.filter((item) => item._type == "level_roi");
+      setLevelNode2(arr);
     }
-
-  }, [levelNode])
+  }, [levelNode]);
 
   useEffect(() => {
-    const value = ltRateINR / ltRateUSDT
+    const value = ltRateINR / ltRateUSDT;
     // console.log(value, "Value")
-    setbdtPrice(value)
+    setbdtPrice(value);
   }, [ltRateINR, ltRateUSDT]);
 
   const ref_addr = window.location.href;
@@ -176,10 +277,9 @@ export default function Home() {
   }
 
   const css = {
-    color: "white"
-  }
+    color: "white",
+  };
   useEffect(() => {
-
     const url_address = window?.frames?.location?.href;
     // console.log("url address: ", url_address.split("?"), window);
     const url = url_address ? url_address.split("?")[1] : "";
@@ -191,14 +291,16 @@ export default function Home() {
     console.log("Referrer Id", ref_addr);
     let nnnnn = ref_addr.split("?ref_id=");
     setref_id1(nnnnn[1]);
-    globalStat().then(d => {
-      console.log("global Data", d);
-      setTotalmember(d.result.totalUser);
-      setTotalInv(d.result.totalPayout);
-      setPrice(d?.totalNodeBuy ?? 0);
-      setSmartBalance(d?.contract_balance);
-      setTotalWithdraw(d?.withdraw ?? 0);
-    }).catch(e => console.log(e));
+    globalStat()
+      .then((d) => {
+        console.log("global Data", d);
+        setTotalmember(d.result.totalUser);
+        setTotalInv(d.result.totalPayout);
+        setPrice(d?.totalNodeBuy ?? 0);
+        setSmartBalance(d?.contract_balance);
+        setTotalWithdraw(d?.withdraw ?? 0);
+      })
+      .catch((e) => console.log(e));
   }, []);
 
   let j = 2;
@@ -234,7 +336,19 @@ export default function Home() {
       name: "Target Status",
       selector: "vip2",
       sortable: true,
-      cell: data => <span className={`badge text-white ${data.total_member >= data.required_member ? 'bg-success' : 'bg-danger'}`}>{(data.total_member >= data.required_member ? "Achieved" : "Not Achieved")}</span>
+      cell: (data) => (
+        <span
+          className={`badge text-white ${
+            data.total_member >= data.required_member
+              ? "bg-success"
+              : "bg-danger"
+          }`}
+        >
+          {data.total_member >= data.required_member
+            ? "Achieved"
+            : "Not Achieved"}
+        </span>
+      ),
     },
   ];
 
@@ -266,12 +380,9 @@ export default function Home() {
           target="_blank"
           style={{ color: "white", textDecoration: "none" }}
         >
-          {
-            row.user
-              ? row.user.substr(0, 7) +
-              "......." +
-              row.user.substr(35, 43)
-              : "--"}
+          {row.user
+            ? row.user.substr(0, 7) + "......." + row.user.substr(35, 43)
+            : "--"}
           <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
         </a>
       ),
@@ -302,7 +413,8 @@ export default function Home() {
         backgroundColor: "transparent",
         color: "rgba(63, 195, 128, 0.9)",
       },
-    }, {
+    },
+    {
       name: "User Id",
       selector: (row) => row.userId,
       sortable: true,
@@ -319,14 +431,10 @@ export default function Home() {
           target="_blank"
           style={{ color: "white", textDecoration: "none" }}
         >
-          {
-            row.sender
-              ? row.sender.substr(0, 7) +
-              "......." +
-              row.sender.substr(35, 43)
-              : "--"}
+          {row.sender
+            ? row.sender.substr(0, 7) + "......." + row.sender.substr(35, 43)
+            : "--"}
           <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
-
         </a>
       ),
       sortable: true,
@@ -346,7 +454,14 @@ export default function Home() {
     },
     {
       name: "Income Type",
-      selector: (row) => row._for == "direct_sponcer" ? "Sponsor Income" : row._for == "reward_income" ? "Star Income" :row._for=="node_stair_income"?"Node Stair Reward": "Stair Income",
+      selector: (row) =>
+        row._for == "direct_sponcer"
+          ? "Sponsor Income"
+          : row._for == "reward_income"
+          ? "Star Income"
+          : row._for == "node_stair_income"
+          ? "Node Stair Reward"
+          : "Stair Income",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -355,7 +470,8 @@ export default function Home() {
     },
     {
       name: "Timestamp",
-      selector: (row) => new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
+      selector: (row) =>
+        new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -369,16 +485,16 @@ export default function Home() {
           href={`https://explorer.bdltscan.io/tx/${row.transaction_id}/internal-transactions`}
           target="_blank"
           style={{ color: "white", textDecoration: "none" }}
-
         >
-          {
-            row.transaction_id
-              ? row.transaction_id.substr(0, 10) +
+          {row.transaction_id
+            ? row.transaction_id.substr(0, 10) +
               "......." +
-              row.transaction_id.substr((row.transaction_id).length - 10, (row.transaction_id).length)
-              : "--"}
+              row.transaction_id.substr(
+                row.transaction_id.length - 10,
+                row.transaction_id.length
+              )
+            : "--"}
           <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
-
         </a>
       ),
       sortable: true,
@@ -410,7 +526,8 @@ export default function Home() {
     },
     {
       name: "Timestamp",
-      selector: (row) => new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
+      selector: (row) =>
+        new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -426,16 +543,113 @@ export default function Home() {
           target="_blank"
           style={{ color: "white", textDecoration: "none" }}
         >
-          {
-            row.transaction_id
-              ? row.transaction_id.substr(0, 10) +
+          {row.transaction_id
+            ? row.transaction_id.substr(0, 10) +
               "......." +
-              row.transaction_id.substr((row.transaction_id).length - 10, (row.transaction_id).length)
-              : "--"}
+              row.transaction_id.substr(
+                row.transaction_id.length - 10,
+                row.transaction_id.length
+              )
+            : "--"}
           <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
-
         </a>
       ),
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+  ];
+
+  const royalitycolumn = [
+    {
+      name: "SR No.",
+      selector: (row, i) => i + 1,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
+    },
+    {
+      name: "Amount",
+      selector: (row) => (Number(row.amount) / 1e18).toFixed(2) + " BDLT",
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+    {
+      name: "Timestamp",
+      selector: (row) =>
+        new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+
+    {
+      name: "Transaction Id",
+      selector: (row) => (
+        <a
+          href={`https://explorer.bdltscan.io/tx/${row.transaction_id}/internal-transactions`}
+          target="_blank"
+          style={{ color: "white", textDecoration: "none" }}
+        >
+          {row.transaction_id
+            ? row.transaction_id.substr(0, 10) +
+              "......." +
+              row.transaction_id.substr(
+                row.transaction_id.length - 10,
+                row.transaction_id.length
+              )
+            : "--"}
+          <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
+        </a>
+      ),
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+  ];
+
+  const royalityincomecolumn = [
+    {
+      name: "SR No.",
+      selector: (row, i) => i + 1,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
+    },
+    {
+      name: "Level",
+      selector: (row, i) => row.level,
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "rgba(63, 195, 128, 0.9)",
+      },
+    },
+    {
+      name: "Amount",
+      selector: (row) => Number(row.amount).toFixed(2) + " BDLT",
+      sortable: true,
+      style: {
+        backgroundColor: "transparent",
+        color: "black",
+      },
+    },
+    {
+      name: "Timestamp",
+      selector: (row) => new Date(row.timestamp).toLocaleString(),
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -465,7 +679,8 @@ export default function Home() {
     },
     {
       name: "Node Type",
-      selector: (row) => row._type == "level_roi" ? "Stair Node " : "Sponsor Node",
+      selector: (row) =>
+        row._type == "level_roi" ? "Stair Node " : "Sponsor Node",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -474,7 +689,7 @@ export default function Home() {
     },
     {
       name: "Monthly Roi",
-      selector: (row) => row._type == "level_roi" ? "3% " : "2%",
+      selector: (row) => (row._type == "level_roi" ? "3% " : "2%"),
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -483,7 +698,8 @@ export default function Home() {
     },
     {
       name: "Timestamp",
-      selector: (row) => new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
+      selector: (row) =>
+        new Date(Number(row.block_timestamp) * 1000).toLocaleString(),
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -497,16 +713,16 @@ export default function Home() {
           href={`https://explorer.bdltscan.io/tx/${row.transaction_id}/internal-transactions`}
           target="_blank"
           style={{ color: "white", textDecoration: "none" }}
-
         >
-          {
-            row.transaction_id
-              ? row.transaction_id.substr(0, 10) +
+          {row.transaction_id
+            ? row.transaction_id.substr(0, 10) +
               "......." +
-              row.transaction_id.substr((row.transaction_id).length - 10, (row.transaction_id).length)
-              : "--"}
+              row.transaction_id.substr(
+                row.transaction_id.length - 10,
+                row.transaction_id.length
+              )
+            : "--"}
           <FiExternalLink size={18} className="mx-1 pb-1" color="white" />
-
         </a>
       ),
       sortable: true,
@@ -529,7 +745,6 @@ export default function Home() {
         fontWeight: "500",
         textTransform: "uppercase",
         paddingLeft: "0 8px",
-
       },
     },
     cells: {
@@ -552,8 +767,11 @@ export default function Home() {
                 ? round(Number(d.data.sponcerIncome) / 1e18)
                 : 0
             );
-            setOldRoi(d.user[0].old_roi? round(Number(d.user[0].old_roi) / 1e18)
-            : 0);
+            setLdp(d.user[0].qualified_ldp);
+            // setLdp(1);
+            setOldRoi(
+              d.user[0].old_roi ? round(Number(d.user[0].old_roi) / 1e18) : 0
+            );
             setLevelIncome(
               d.data.levelIncome ? round(Number(d.data.levelIncome) / 1e18) : 0
             );
@@ -563,31 +781,48 @@ export default function Home() {
                 : 0
             );
             setStackingReward(
-              d.data.rewardIncome ? Math.round((Number(d.data.rewardIncome) / 1e18) * 1000000000) / 1000000000 : 0
+              d.data.rewardIncome
+                ? Math.round(
+                    (Number(d.data.rewardIncome) / 1e18) * 1000000000
+                  ) / 1000000000
+                : 0
             );
             setDirectSponsorRoi(
-              d.direct_roi ? Math.round((Number(d.direct_roi) / 1e18) * 1000000000) / 1000000000 : 0
+              d.direct_roi
+                ? Math.round((Number(d.direct_roi) / 1e18) * 1000000000) /
+                    1000000000
+                : 0
             );
             setSelfNodeRoi(
-              d.self_roi ? Math.round((Number(d.self_roi) / 1e18) * 1000000000) / 1000000000 : 0
+              d.self_roi
+                ? Math.round((Number(d.self_roi) / 1e18) * 1000000000) /
+                    1000000000
+                : 0
             );
-            setNodeby(
-              d.data.isNodebuy
-            );
-
+            setNodeby(d.data.isNodebuy);
+            setPartnersCount(d.data.partnersCount);
+            setRewardStatus(d.data.reward_status);
             setNodeLevelRoi(
-              d.data.node[2] ? Math.round((Number(d.data.node[2]) / 1e18) * 1000000000) / 1000000000 : 0
+              d.data.node[2]
+                ? Math.round((Number(d.data.node[2]) / 1e18) * 1000000000) /
+                    1000000000
+                : 0
             );
             setRefferer(d.data.referrer);
-            console.log("Royalty Wallet :: ", d.result[0].royalty_wallet)
-            setRoyaltyWallet(d.result[0].royalty_wallet);
+            console.log("Royalty Wallet :: ", d.user[0].royalty_wallet);
+            setRoyaltyWallet(d.user[0].royalty_wallet);
             setjoinAmount(d.data.joiningAmt);
 
             setDirectSponcer(d.data.partnersCount);
             setWithdrawAmt(
-              d.data.withdrawn ? round(Number(d.data.withdrawn) / 1e18) + d.withdraw : 0
+              d.data.withdrawn
+                ? round(Number(d.data.withdrawn) / 1e18) + d.withdraw
+                : 0
             );
-            console.log((Math.round((Number(d.roi) / 1e18) * 1000000000) / 1000000000) + Number(d.result[0].royalty_wallet))
+            console.log(
+              Math.round((Number(d.roi) / 1e18) * 1000000000) / 1000000000 +
+                Number(d.result[0].royalty_wallet)
+            );
           } else {
             console.log("Error:::", d.err);
           }
@@ -595,46 +830,68 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
-      getRequiredMembers(wallet_address).then((ss) => {
-        if (ss) {
-          getRequiredMember(ss);
-        }
-      }).catch((e) => {
-        console.log(e);
-      });
-      getTeam(wallet_address).then((ss) => {
-        if (ss) {
-          setTeam(ss);
-        }
-      }).catch((e) => {
-        console.log(e);
-      });
-      getIncome(wallet_address).then((ss) => {
-
-        if (ss) {
-          setIncome(ss.result);
-        }
-      }).catch((e) => {
-        console.log(e);
-      });
-      getLevelSponsor(wallet_address).then((ss) => {
-
-        if (ss) {
-          setLevelNode(ss.data);
-        }
-      }).catch((e) => {
-        console.log(e);
-      });
-      getWithdraw(wallet_address).then((ss) => {
-        if (ss) {
-          console.log("DATA :: ", ss);
-          setWithdraw(ss.result);
-        }
-      }).catch((e) => {
-        console.log(e);
-      });
+      getRequiredMembers(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            getRequiredMember(ss);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      getTeam(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            setTeam(ss);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      getIncome(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            setIncome(ss.result);
+            setRoyalityIncome(ss.income);
+            /*  console.log(
+              ss.income,
+              "roylityIncome-------------------------------"
+            ); */
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      getLevelSponsor(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            setLevelNode(ss.data);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      getWithdraw(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            console.log("DATA :: ", ss);
+            setWithdraw(ss.result);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      getRoyalityHistory(wallet_address)
+        .then((ss) => {
+          if (ss) {
+            // console.log("DATA :: ", ss);
+            setRoyalityHistory(ss.royality);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     }
-
     // nodeJoiningAmount()
   }, [wallet_address, reflect]);
 
@@ -660,64 +917,63 @@ export default function Home() {
     setspin("spinner-border spinner-border-sm");
     // balance >= joinAmount
     if (balance >= joinAmount) {
-    console.log("refferal Id::", ref_id1, joinAmount);
-    contract.methods
-      .isUserExists(wallet_address)
-      .call()
-      .then((is_exist) => {
-        if (!is_exist) {
-          contract.methods
-            .idToAddress(ref_id1)
-            .call()
-            .then((d) => {
-              console.log("Refferal Address ::", d);
-              if (d !== "0x0000000000000000000000000000000000000000") {
-                contract.methods
-                  .registrationExt(wallet_address, d)
-                  .send({
-                    from: wallet_address,
-                    value: joiningPackage,
-                    // value: 0,
-                  })
-                  .then((d) => {
-                    setspin("");
-                    setdisable(false);
-                    setReflect(!reflect);
-                  })
-                  .catch((e) => {
-                    console.log("Error :: ", e);
-                    setspin("");
-                    setdisable(false);
-                    setReflect(!reflect);
-                  });
-              } else {
-                NotificationManager.error(
-                  "Refferal Not Exist",
-                  "Invalid Referrel"
-                );
+      console.log("refferal Id::", ref_id1, joinAmount);
+      contract.methods
+        .isUserExists(wallet_address)
+        .call()
+        .then((is_exist) => {
+          if (!is_exist) {
+            contract.methods
+              .idToAddress(ref_id1)
+              .call()
+              .then((d) => {
+                console.log("Refferal Address ::", d);
+                if (d !== "0x0000000000000000000000000000000000000000") {
+                  contract.methods
+                    .registrationExt(wallet_address, d)
+                    .send({
+                      from: wallet_address,
+                      value: joiningPackage,
+                      // value: 0,
+                    })
+                    .then((d) => {
+                      setspin("");
+                      setdisable(false);
+                      setReflect(!reflect);
+                    })
+                    .catch((e) => {
+                      console.log("Error :: ", e);
+                      setspin("");
+                      setdisable(false);
+                      setReflect(!reflect);
+                    });
+                } else {
+                  NotificationManager.error(
+                    "Refferal Not Exist",
+                    "Invalid Referrel"
+                  );
+                  setspin("");
+                  setdisable(false);
+                  setReflect(!reflect);
+                }
+              })
+              .catch((e) => {
+                console.log("Error:: ", e);
                 setspin("");
                 setdisable(false);
-                setReflect(!reflect);
-              }
-            })
-            .catch((e) => {
-              console.log("Error:: ", e);
-              setspin("");
-              setdisable(false);
-            });
-        } else {
-          NotificationManager.error("user already Join", "Already Exist");
+              });
+          } else {
+            NotificationManager.error("user already Join", "Already Exist");
+            setspin("");
+            setdisable(false);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
           setspin("");
           setdisable(false);
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-        setspin("");
-        setdisable(false);
-      });
-    }
-    else {
+        });
+    } else {
       NotificationManager.error("Low Balance ", "Error");
       setspin("");
       setdisable(false);
@@ -726,17 +982,13 @@ export default function Home() {
 
   async function onRoyaltyWithdraw() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       setspin3("spinner-border spinner-border-sm");
       royaltyWithdraw(wallet_address)
         .then((d) => {
           if (d.status) {
-            NotificationManager.info(
-              d.result
-            );
+            NotificationManager.info(d.result);
           }
           console.log("Data:", d);
           setspin3("");
@@ -762,9 +1014,7 @@ export default function Home() {
           setspin3("");
           setReflect(!reflect);
         } else {
-          NotificationManager.info(
-            "No ID found!"
-          );
+          NotificationManager.info("No ID found!");
         }
       })
       .catch((e) => {
@@ -780,9 +1030,7 @@ export default function Home() {
 
   async function onWithdraw() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       setspin3("spinner-border spinner-border-sm");
       contract?.methods
@@ -802,9 +1050,7 @@ export default function Home() {
   }
   async function onNodeRoiWithdraw() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       setspin3("spinner-border spinner-border-sm");
       contract?.methods
@@ -825,26 +1071,24 @@ export default function Home() {
 
   async function onUpgradeNode() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       if (balance >= 50000) {
-      setspin3("spinner-border spinner-border-sm");
-      contract?.methods
-        ?.stakeNode(wallet_address)
-        .send({ from: wallet_address, value: "50000000000000000000000" })
-        .then((d) => {
-          console.log("Data:", d);
-          setspin3("");
-          setReflect(!reflect);
-        })
-        .catch((e) => {
-          console.log("Error:: ", e);
-          setspin3("");
-          setReflect(!reflect);
-        });
-      }else {
+        setspin3("spinner-border spinner-border-sm");
+        contract?.methods
+          ?.stakeNode(wallet_address)
+          .send({ from: wallet_address, value: "50000000000000000000000" })
+          .then((d) => {
+            console.log("Data:", d);
+            setspin3("");
+            setReflect(!reflect);
+          })
+          .catch((e) => {
+            console.log("Error:: ", e);
+            setspin3("");
+            setReflect(!reflect);
+          });
+      } else {
         NotificationManager.error("Low Balance");
       }
     }
@@ -852,9 +1096,7 @@ export default function Home() {
 
   async function onUnstake() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       setspin3("spinner-border spinner-border-sm");
       contract?.methods
@@ -875,9 +1117,7 @@ export default function Home() {
 
   async function nodeJoiningAmount() {
     if (viewmodeflag) {
-      NotificationManager.info(
-        "Withdraw is not available in view mode!"
-      );
+      NotificationManager.info("Withdraw is not available in view mode!");
     } else {
       setspin3("spinner-border spinner-border-sm");
       contract?.methods
@@ -897,26 +1137,80 @@ export default function Home() {
     }
   }
 
-  // console.log(timer, "timertimer tdfdjf")
+  /* console.log(partnersCount, "test partner count value");
+  console.log(rewardStatus, "test reward status value");
 
   const time = new Date(1646975640 * 1000);
-  time.setSeconds(time.getSeconds() + 3.156e+7)
+  time.setSeconds(time.getSeconds() + 3.156e7);*/
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
+
+  const [showModal1, setShowModal1] = useState(false);
+
+  const handleClose1 = () => setShowModal1(false);
+  const handleShow1 = () => setShowModal1(true);
+
+  //  const [validated, setValidated] = useState(false);
+
+  // const handleSubmit = (event) => {
+  //   const form = event.currentTarget;
+  //   if (form.checkValidity() === false) {
+  //     event.preventDefault();
+  //     event.stopPropagation();
+  //   }
+
+  //   setValidated(true);
+  // };
+
+  const handelFormSubmit = (waddr, name, mobile, aadhaar, address) => {
+    if (
+      name.trim().length > 0 &&
+      mobile.trim().length > 0 &&
+      aadhaar.trim().length > 0 &&
+      address.trim().length > 0
+    ) {
+      getLdpInfo(waddr, name, mobile, aadhaar, address).then((res) => {
+        if (res.status) {
+          NotificationManager.success(res.result);
+          setShowModal(false);
+          handleShow1();
+          setTimeout(() => {
+            handleClose1();
+          }, 20000);
+        } else {
+          NotificationManager.error("Something Went Wrong");
+        }
+      });
+    } else {
+      NotificationManager.error("Please fill all the fields");
+    }
+  };
+
+  /*  handleInputChange = name => event => {
+    this.setState({
+      [name]: event.target.value.replace(/^[0-9]{10}$/)
+    })
+  } */
+  useEffect(() => {
+    setBalance(wallet_balance);
+    setContract(contractAddress);
+    setWalletAddress(Waddress);
+    setJoiningPackage(joinPackage);
+  }, []);
+  
   return (
     <>
       <div className="container">
         <div className="ticker">
-          {/*  <div className="title">
-              <h5>Offer</h5>
-            </div> */}
-
           <div className="news">
             <marquee className="news-content">
-              Learning development program(LDP)
-              Qualify criteria- Direct 10 Members or 1st to 4th level qualified
-              Max Members- First 150 team Members only
-              Time period- 1March -31March
-              LDP duration- 3days 2 night
+              *****Bumper Tour Offer ***** *Travel for Bangkok/ Thailand*
+              Qualify Criteria : New added 7th level Achiever or Achive next
+              level in this time period. Time Period : 12 April-10 May Max
+              Members : First 100 Members Time Duration : 3 Night and 4 Days
             </marquee>
           </div>
         </div>
@@ -924,43 +1218,351 @@ export default function Home() {
       <div className="container text-center mt-4">
         <div className="row">
           <div
-            className="col-md-12 col-sm-12 col-lg-6"
+            className="col-md-12 col-sm-12 col-lg-4"
             style={{ fontSize: "30px" }}
           >
             <img
+              alt="img"
               src="./img/logo-black.png"
               className="img img-fluid"
               style={{ width: "150px" }}
             />
           </div>
-          <div className="col-md-12 col-sm-12 col-lg-6">
+          <div className="col-md-12 col-sm-12 col-lg-8">
             <div className="row">
               <div
-                className="col-md-6 col-lg-6 col-sm-12 asm d-flex justify-content-center"
-                style={{ flexDirection: "column" }}
-              >
-                <a className="grad_btn btn-block text-light my-2" style={{ fontSize: "0.875rem" }} onClick={() => window.addNetwork("web3")}>
-                  <img className="mr-1" width={24} src="https://bscscan.com/images/svg/brands/metamask.svg" alt="Metamask" /> Add to Metamask
-                </a>
-
-              </div>
-              <div
-                className="col-md-6 col-lg-6 col-sm-12 d-flex justify-content-center"
+                className="col-md-12 col-sm-12 col-lg-4"
+                style={{ fontSize: "30px" }}
+              ></div>
+              <div className="col-md-12 col-sm-12 col-lg-8">
+                <div className="row">
+                  {/*   <div
+                className="col-md-4 col-lg-4 col-sm-12 asm d-flex justify-content-center"
                 style={{ flexDirection: "column" }}
               >
                 <a
-                  href="/BDLT.pdf"
+                  className="grad_btn btn-block text-light my-2"
+                  style={{ fontSize: "0.875rem" }}
+                  onClick={() => window.addNetwork("web3")}
+                >
+                  <img
+                    className="mr-1"
+                    width={24}
+                    src="https://bscscan.com/images/svg/brands/metamask.svg"
+                    alt="Metamask"
+                  />{" "}
+                  Add to Metamask
+                </a>
+              </div> */}
+                  {/* <div
+                className="col-md-6 col-lg-4 col-sm-12 d-flex justify-content-center"
+                style={{ flexDirection: "column" }}
+              >
+                <a
+                  href="/bdlt_pdfupdate.pdf"
                   className="grad_btn btn-block text-light my-2 "
                   style={{ padding: "10px 55px" }}
                   target="_blank"
                 >
-                  Download Plan
+                 BDLT Swap
                 </a>
+              </div>
+
+              <div
+                className="col-md-6 col-lg-4 col-sm-12 d-flex justify-content-center"
+                style={{ flexDirection: "column" }}
+              >
+                <a
+                  href="https://trade.buyucoin.com/trade/INR-BDLT"
+                  target="_blank"
+                  className="grad_btn btn-block text-light my-2 "
+                  style={{ padding: "10px 55px" }}
+                >
+                  Explorer
+                </a>
+              </div> */}
+                  <nav class="navbar navbar-expand-lg navbar-dark">
+                    <button
+                      class="navbar-toggler"
+                      type="button"
+                      onClick={() => {
+                        const nc = document.getElementById(
+                          "navbarSupportedContent"
+                        );
+                        nc.classList.toggle("show");
+                      }}
+                    >
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div
+                      class="collapse navbar-collapse"
+                      id="navbarSupportedContent"
+                    >
+                      <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <img
+                              className=""
+                              width={24}
+                              src="https://bscscan.com/images/svg/brands/metamask.svg"
+                              alt="Metamask"
+                            />
+                            <a
+                              class="nav-link"
+                              style={{ color: "white" }}
+                              onClick={() => window.addNetwork("web3")}
+                            >
+                              Add to Metamask
+                              {/* <span class="sr-only">(current)</span> */}
+                            </a>
+                          </div>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            class="nav-link"
+                            href="/bdlt_pdfupdate.pdf"
+                            target="_blank"
+                            style={{ color: "white" }}
+                          >
+                            Download Plan
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            class="nav-link"
+                            href="https://trade.buyucoin.com/trade/INR-BDLT"
+                            target="_blank"
+                            style={{ color: "white" }}
+                          >
+                            Buy BDLT
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            class="nav-link"
+                            href="https://bdltswap.com"
+                            target="_blank"
+                            style={{ color: "white" }}
+                          >
+                            BDLT Swap
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a
+                            class="nav-link"
+                            href="https://explorer.bdltscan.io"
+                            target="_blank"
+                            style={{ color: "white" }}
+                          >
+                            Explorer
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </nav>
+                  {/* <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="#">
+                      Navbar
+                    </a>
+                    <button
+                      class="navbar-toggler"
+                      type="button"
+                      data-toggle="collapse"
+                      data-target="#navbarSupportedContent"
+                      aria-controls="navbarSupportedContent"
+                      aria-expanded="false"
+                      aria-label="Toggle navigation"
+                    >
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div
+                      class="collapse navbar-collapse"
+                      id="navbarSupportedContent"
+                    >
+                      <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                          <a class="nav-link" href="#">
+                            Home <span class="sr-only">(current)</span>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#">
+                            Link
+                          </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                          <a
+                            class="nav-link dropdown-toggle"
+                            href="#"
+                            id="navbarDropdown"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            Dropdown
+                          </a>
+                          <div
+                            class="dropdown-menu"
+                            aria-labelledby="navbarDropdown"
+                          >
+                            <a class="dropdown-item" href="#">
+                              Action
+                            </a>
+                            <a class="dropdown-item" href="#">
+                              Another action
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">
+                              Something else here
+                            </a>
+                          </div>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link disabled" href="#">
+                            Disabled
+                          </a>
+                        </li>
+                      </ul>
+                      <form class="form-inline my-2 my-lg-0">
+                        <input
+                          class="form-control mr-sm-2"
+                          type="search"
+                          placeholder="Search"
+                          aria-label="Search"
+                        />
+                        <button
+                          class="btn btn-outline-success my-2 my-sm-0"
+                          type="submit"
+                        >
+                          Search
+                        </button>
+                      </form>
+                    </div>
+                  </nav> */}
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div className="row">
+          <div
+            className="col-md-12 col-sm-12 col-lg-4"
+            style={{ fontSize: "30px" }}
+          ></div>
+          <div className="col-md-12 col-sm-12 col-lg-8">
+            <div className="row">
+              {/*   <div
+                className="col-md-4 col-lg-4 col-sm-12 asm d-flex justify-content-center"
+                style={{ flexDirection: "column" }}
+              >
+                <a
+                  className="grad_btn btn-block text-light my-2"
+                  style={{ fontSize: "0.875rem" }}
+                  onClick={() => window.addNetwork("web3")}
+                >
+                  <img
+                    className="mr-1"
+                    width={24}
+                    src="https://bscscan.com/images/svg/brands/metamask.svg"
+                    alt="Metamask"
+                  />{" "}
+                  Add to Metamask
+                </a>
+              </div> */}
+              {/* <div
+                className="col-md-6 col-lg-4 col-sm-12 d-flex justify-content-center"
+                style={{ flexDirection: "column" }}
+              >
+                <a
+                  href="/bdlt_pdfupdate.pdf"
+                  className="grad_btn btn-block text-light my-2 "
+                  style={{ padding: "10px 55px" }}
+                  target="_blank"
+                >
+                 BDLT Swap
+                </a>
+              </div>
+
+              <div
+                className="col-md-6 col-lg-4 col-sm-12 d-flex justify-content-center"
+                style={{ flexDirection: "column" }}
+              >
+                <a
+                  href="https://trade.buyucoin.com/trade/INR-BDLT"
+                  target="_blank"
+                  className="grad_btn btn-block text-light my-2 "
+                  style={{ padding: "10px 55px" }}
+                >
+                  Explorer
+                </a>
+              </div> */}
+              {/* <div class="navbar navbar-expand-lg" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item active">
+                   <img
+                    className="mr-1"
+                    width={24}
+                    src="https://bscscan.com/images/svg/brands/metamask.svg"
+                    alt="Metamask"
+                  /> 
+                    <a class="nav-link" href="#" style={{color: "white"}}
+                    onClick={() => window.addNetwork("web3")}
+                    >
+                      Add to Metamask <span class="sr-only">(current)</span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/bdlt_pdfupdate.pdf" target="_blank" style={{color: "white"}}>
+                      Download Plan
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="https://trade.buyucoin.com/trade/INR-BDLT" target="_blank" style={{color: "white"}}>
+                      Buy BDLT
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="https://bdltswap.com" target="_blank" style={{color: "white"}}>
+                      BDLT Swap
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="https://explorer.bdltscan.io" target="_blank" style={{color: "white"}}>
+                    Explorer
+                    </a>
+                  </li>
+                </ul>
+              </div> */}
+            </div>
+          </div>
+        </div>
       </div>
+      <Modal show={showModal1} onHide={handleClose1} style={{ color: "black" }}>
+        <Modal.Header closeButton>
+          {/* <Modal.Title style={{ color: "black" }}>
+            Info
+          </Modal.Title> */}
+        </Modal.Header>
+        <Modal.Body>
+          <h5>Admin Team will contact and confirm you for LDP.</h5>
+        </Modal.Body>
+        {/*  <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Save
+          </Button>
+        </Modal.Footer> */}
+      </Modal>
 
       <section className="banner_section pt_50 pb_50 mt-5">
         <div className="container">
@@ -977,13 +1579,26 @@ export default function Home() {
         </div>
       </section>
       <section>
-
         <div className="container">
           <div className="row cus_row">
             <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
                 <h4> Smart Contract Address </h4>
-                <h5><a href={`https://explorer.bdltscan.io/address/${CONTRACT_ADDRESS}/contracts`} target={"_blank"} style={{ color: "white", textDecoration: "none" }}>{CONTRACT_ADDRESS.substr(0, 5)}....{CONTRACT_ADDRESS.substr(-8)}<FiExternalLink size={18} className="mx-1 pb-1" color="white" /></a></h5>
+                <h5>
+                  <a
+                    href={`https://explorer.bdltscan.io/address/${CONTRACT_ADDRESS}/contracts`}
+                    target={"_blank"}
+                    style={{ color: "white", textDecoration: "none" }}
+                  >
+                    {CONTRACT_ADDRESS.substr(0, 5)}....
+                    {CONTRACT_ADDRESS.substr(-8)}
+                    <FiExternalLink
+                      size={18}
+                      className="mx-1 pb-1"
+                      color="white"
+                    />
+                  </a>
+                </h5>
               </div>
             </div>
 
@@ -995,7 +1610,7 @@ export default function Home() {
             </div>
             <div className="col-md-4 col-sm-6 col-6">
               <div className="Personal_Details_inner">
-                <h4>Total Node Member  </h4>
+                <h4>Total Node Member </h4>
                 <h5>{price}</h5>
               </div>
             </div>
@@ -1050,8 +1665,8 @@ export default function Home() {
                   <span style={{ fontSize: "15px" }}>
                     {wallet_address
                       ? wallet_address.substr(0, 10) +
-                      "......." +
-                      wallet_address.substr(25)
+                        "......." +
+                        wallet_address.substr(25)
                       : "Press Refresh for Wallet Address if Metamask is connected"}
                   </span>{" "}
                 </h6>
@@ -1063,6 +1678,17 @@ export default function Home() {
                       onConnect()
                         .then((d) => {
                           console.log(d);
+                          dispatch({ type: SET_ADDRESS, data: d?.userAddress });
+                          dispatch({ type: SET_LOGGEDIN, data: true });
+                          dispatch({ type: TOTAL_BALANCE, data: d?.balance });
+                          dispatch({
+                            type: SET_JOIN_PACKAGE,
+                            data: d?.joiningPackage,
+                          });
+                          dispatch({
+                            type: SET_CONTRACT_ADDRESS,
+                            data: d?.contract,
+                          });
                           setBalance(round(d?.balance));
                           setContract(d?.contract);
                           setWalletAddress(d?.userAddress);
@@ -1170,48 +1796,250 @@ export default function Home() {
                   <span style={{ fontSize: "15px" }}>
                     {wallet_address
                       ? wallet_address.substr(0, 10) +
-                      "......." +
-                      wallet_address.substr(25)
+                        "......." +
+                        wallet_address.substr(25)
                       : "Press Refresh for Wallet Address if Metamask is connected"}
                   </span>{" "}
+                  {rewardStatus == 2 && partnersCount == 10 ? (
+                    <sup>
+                      <AiFillStar size={20} /> user
+                    </sup>
+                  ) : null}
                 </h6>
                 <h6>
                   Your Wallet Balance -{" "}
-                  <span style={{ fontSize: "15px" }}>
-                    {balance ?? 0} BDLT
-                  </span>{" "}
+                  <span style={{ fontSize: "15px" }}>{balance ?? 0} BDLT</span>{" "}
                 </h6>
                 {viewmodeflag == 0 ? (
+                  <div className="ldp">
+                    <button
+                      className="grad_btn btn-block mx-4"
+                      style={{ padding: "10px 15px" }}
+                      onClick={() => {
+                        onConnect()
+                          .then((d) => {
+                            console.log(d);
+                            dispatch({
+                              type: SET_ADDRESS,
+                              data: d?.userAddress,
+                            });
+                            dispatch({ type: SET_LOGGEDIN, data: true });
+                            dispatch({ type: TOTAL_BALANCE, data: d?.balance });
+                            dispatch({
+                              type: SET_JOIN_PACKAGE,
+                              data: d?.joiningPackage,
+                            });
+                            dispatch({
+                              type: SET_CONTRACT_ADDRESS,
+                              data: d?.contract,
+                            });
+                            setBalance(round(d?.balance));
+                            setContract(d?.contract);
+                            setWalletAddress(d?.userAddress);
+                            setJoiningPackage(d?.joiningPackage);
+                          })
+                          .catch((e) => console.log(e));
+                      }}
+                    >
+                      Connect Wallet
+                    </button>
+                    {/* {ldp == 1 ? (
+                      <button
+                        className="grad_btn btn-block mx-2"
+                        style={{ padding: "10px 15px" }}
+                        onClick={handleShow}
+                      >
+                        Apply for LDP
+                      </button>
+                    ) : ldp == 2 ? (
+                      <button
+                        className="grad_btn btn-block mx-2"
+                        style={{ padding: "10px 15px" }}
+                      >
+                        LDP Already Applied
+                      </button>
+                      // <button onClick={handleShow1}> Click</button>
+                    ) : null} */}
 
-                  <button
-                    className="grad_btn btn-block mx-4"
-                    style={{ padding: "10px 15px" }}
-                    onClick={() => {
-                      onConnect()
-                        .then((d) => {
-                          console.log(d);
-                          setBalance(round(d?.balance));
-                          setContract(d?.contract);
-                          setWalletAddress(d?.userAddress);
-                          setJoiningPackage(d?.joiningPackage);
-                        })
-                        .catch((e) => console.log(e));
-                    }}
-                  >
-                    Connect Wallet
-                  </button>
+                    <>
+                      {/* <div
+                        className="d-flex align-items-center justify-content-center"
+                        style={{ height: "1vh" }}
+                      ></div> */}
+                      <Modal
+                        show={showModal}
+                        onHide={handleClose}
+                        style={{ color: "black" }}
+                      >
+                        <Modal.Header closeButton>
+                          <Modal.Title style={{ color: "black" }}>
+                            Enter Details
+                          </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                          <Form
+                            onSubmit={(e) => {
+                              e.preventDefault();
 
+                              handelFormSubmit(
+                                wallet_address,
+                                name,
+                                mobile,
+                                aadhaar,
+                                address
+                              );
+                            }}
+                          >
+                            <Form.Group className="mb-3">
+                              <Form.Label>Name*</Form.Label>
+                              <Form.Control
+                                required
+                                minLength={2}
+                                maxLength={30}
+                                name="name"
+                                type="text"
+                                placeholder="Enter Name"
+                                value={name}
+                                onChange={(e) => {
+                                  setName(e.target.value);
+                                  setNameErr(false);
+                                }}
+                                onBlur={() => {
+                                  if (name === "") {
+                                    setNameErr(true);
+                                  }
+                                }}
+                              />
+                              {nameErr == true ? (
+                                <p
+                                  style={{
+                                    color: "firebrick",
+                                    marginTop: "5px",
+                                  }}
+                                >
+                                  Name is Requierd*
+                                </p>
+                              ) : null}
+                            </Form.Group>
 
-
-
-                )
-                  : (
-                    <></>
-                  )}
+                            <Form.Group
+                              className="mb-3"
+                              controlId="formBasicPassword"
+                            >
+                              <Form.Label>Contact Number*</Form.Label>
+                              <Form.Control
+                                required
+                                name="contactNumber"
+                                type="text"
+                                maxLength={10}
+                                minLength={10}
+                                placeholder="Contact Number"
+                                value={mobile}
+                                onChange={(e) => {
+                                  setMobile(
+                                    e.target.value
+                                      .replace(/[^0-9.]/g, "")
+                                      .replace(/(\..*?)\..*/g, "$1")
+                                  );
+                                  setMobileErr(false);
+                                }}
+                                onBlur={() => {
+                                  if (mobile === "") {
+                                    setMobileErr(true);
+                                  }
+                                }}
+                              />
+                              {mobileErr == true ? (
+                                <p
+                                  style={{
+                                    color: "firebrick",
+                                    marginTop: "5px",
+                                  }}
+                                >
+                                  Contact Number is Requierd*
+                                </p>
+                              ) : null}
+                            </Form.Group>
+                            <Form.Group
+                              className="mb-3"
+                              controlId="formBasicPassword"
+                            >
+                              <Form.Label>Aadhaar Number*</Form.Label>
+                              <Form.Control
+                                required
+                                name="aadhaarNumber"
+                                type="text"
+                                maxLength={12}
+                                minLength={12}
+                                placeholder="Enter Aadhaar Number"
+                                value={aadhaar}
+                                onChange={(e) => {
+                                  setAadhaar(
+                                    e.target.value
+                                      .replace(/[^0-9.]/g, "")
+                                      .replace(/(\..*?)\..*/g, "$1")
+                                  );
+                                  setAadhaarErr(false);
+                                }}
+                                onBlur={() => {
+                                  if (aadhaar === "") {
+                                    setAadhaarErr(true);
+                                  }
+                                }}
+                              />
+                              {aadhaarErr == true ? (
+                                <p
+                                  style={{
+                                    color: "firebrick",
+                                    marginTop: "5px",
+                                  }}
+                                >
+                                  Aadhaar Number is Requierd*
+                                </p>
+                              ) : null}
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Address*</Form.Label>
+                              <Form.Control
+                                required
+                                name="address"
+                                type="text"
+                                minLength={4}
+                                placeholder="Enter Address as on Aadhaar"
+                                value={address}
+                                onChange={(e) => {
+                                  setAddress(e.target.value);
+                                  setAddressErr(false);
+                                }}
+                                onBlur={() => {
+                                  if (aadhaar === "") {
+                                    setAddressErr(true);
+                                  }
+                                }}
+                              />
+                              {addressErr == true ? (
+                                <p
+                                  style={{
+                                    color: "firebrick",
+                                    marginTop: "5px",
+                                  }}
+                                >
+                                  Address is Requierd*
+                                </p>
+                              ) : null}
+                            </Form.Group>
+                            <Button type="submit">Submit</Button>
+                          </Form>
+                        </Modal.Body>
+                      </Modal>
+                    </>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
-              {
-
-                nodeBy == false ? (<>
+              {nodeBy == false ? (
+                <>
                   <div className="row cus_row ">
                     <div className="col-md-6 col-sm-12 col-lg-6 mx-auto">
                       <div className="Personal_Details_inner Personal_bg">
@@ -1221,24 +2049,28 @@ export default function Home() {
                             <h5>50000 BDLT</h5>
                           </div>
                         </div>
-                        <button className="grad_btn my-3" onClick={onUpgradeNode}>
+                        <button
+                          className="grad_btn my-3"
+                          onClick={onUpgradeNode}
+                        >
                           Stake Node
                         </button>
                       </div>
                     </div>
-                  </div></>
-                ) : (
-                  <>
-                    <div className="row cus_row ">
-                      <div className="col-md-6 col-sm-12 col-lg-6 mx-auto">
-                        <div className="Personal_Details_inner Personal_bg">
-                          <div className="row ">
-                            <div className="col-4 col-md-6 mx-auto">
-                              <h4>Node Staked Amount</h4>
-                              <h5>50000 BDLT</h5>
-                            </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="row cus_row ">
+                    <div className="col-md-6 col-sm-12 col-lg-6 mx-auto">
+                      <div className="Personal_Details_inner Personal_bg">
+                        <div className="row ">
+                          <div className="col-4 col-md-6 mx-auto">
+                            <h4>Node Staked Amount</h4>
+                            <h5>50000 BDLT</h5>
                           </div>
-                          {/*  {isUnstake ? null :
+                        </div>
+                        {/*  {isUnstake ? null :
                             <MyTimer expiryTimestamp={time} /> 
                           }
                           {isUnstake ?
@@ -1246,23 +2078,18 @@ export default function Home() {
                               Unstake
                             </button>
                             : null} */}
-                          < button className="grad_btn my-3" onClick={onUnstake}>
-                            Unstake
-                          </button>
-                        </div>
+                        <button className="grad_btn my-3" onClick={onUnstake}>
+                          Unstake
+                        </button>
                       </div>
                     </div>
-                  </>
-                )
-              }
-
-
-
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </section>
-      )
-      }
+      )}
 
       <section className="pb_50">
         <div className="container">
@@ -1298,42 +2125,58 @@ export default function Home() {
             <div className="col-md-4 col-sm-4 col-6">
               <div className="Personal_Details_inner">
                 <h4>Direct Sponsor Reward</h4>
-                <h5>{(directIncome).toFixed(2)} BDLT</h5>
+                <h5>{directIncome.toFixed(2)} BDLT</h5>
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-6">
               <div className="Personal_Details_inner">
                 <h4>Stair Reward</h4>
-                <h5>{(levelIncome).toFixed(2)} BDLT</h5>
+                <h5>{levelIncome.toFixed(2)} BDLT</h5>
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner">
                 <h4>Star Reward</h4>
-                <h5>{stackingReward ? Number(stackingReward).toFixed(2) : 0} BDLT</h5>
+                <h5>
+                  {stackingReward ? Number(stackingReward).toFixed(2) : 0} BDLT
+                </h5>
               </div>
             </div>
-
-
           </div>
           {/* Third row */}
           <div className="row cus_row">
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Total Reward</h4>
-                <h5>{round((roi ? Number(roi) : 0) + (royaltyWallet ? Number(royaltyWallet) : 0) + Number(withdrawalAmt)).toFixed(2)} BDLT</h5>
+                <h5>
+                  {round(
+                    (roi ? Number(roi) : 0) +
+                      (royaltyWallet ? Number(royaltyWallet) : 0) +
+                      Number(withdrawalAmt)
+                  ).toFixed(2)}{" "}
+                  BDLT
+                </h5>
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner">
                 <h4>Total Withdrawal</h4>
-                <h5>{round(withdrawalAmt ? Number(withdrawalAmt).toFixed(2) : 0)} BDLT</h5>
+                <h5>
+                  {round(withdrawalAmt ? Number(withdrawalAmt).toFixed(2) : 0)}{" "}
+                  BDLT
+                </h5>
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-12">
               <div className="Personal_Details_inner">
                 <h4>Total Available Reward</h4>
-                <h5>{round((roi ? Number(roi).toFixed(2) : 0) + (royaltyWallet ? Number(royaltyWallet).toFixed(2) : 0))} BDLT</h5>
+                <h5>
+                  {round(
+                    (roi ? Number(roi).toFixed(2) : 0) +
+                      (royaltyWallet ? Number(royaltyWallet).toFixed(2) : 0)
+                  )}{" "}
+                  BDLT
+                </h5>
               </div>
             </div>
           </div>
@@ -1342,12 +2185,16 @@ export default function Home() {
             <div className="col-md-4 col-sm-4 col-lg-4">
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Node Stair Reward</h4>
-                <h5>{(nodeLevelRoi ? Number(nodeLevelRoi).toFixed(2) : 0)} BDLT</h5>
-                <button className="grad_btn my-2" style={{visibility:"hidden"}}>
-                  Withdraw 
+                <h5>
+                  {nodeLevelRoi ? Number(nodeLevelRoi).toFixed(2) : 0} BDLT
+                </h5>
+                <button
+                  className="grad_btn my-2"
+                  style={{ visibility: "hidden" }}
+                >
+                  Withdraw
                 </button>
               </div>
-
             </div>
 
             <div className="col-md-4 col-sm-4 col-lg-4">
@@ -1390,27 +2237,33 @@ export default function Home() {
 
           <div className="row cus_row">
             <div className="col-md-4 col-sm-4 col-lg-4">
-            <div className="Personal_Details_inner Personal_bg">
+              <div className="Personal_Details_inner Personal_bg">
                 <div className="row ">
-                    <h4>Remaining ROS (Old Contract)</h4>
-                    <h5>{oldRoi ? Number(oldRoi).toString() : 0} BDLT</h5>
-                  </div>
-                  <button className="grad_btn my-3" disabled={true}>
+                  <h4>Remaining ROS (Old Contract)</h4>
+                  <h5>{oldRoi ? Number(oldRoi).toString() : 0} BDLT</h5>
+                </div>
+                <button className="grad_btn my-3" disabled={true}>
                   Withdraw
-                </button> 
-                  </div>
+                </button>
+              </div>
             </div>
             <div className="col-md-8 col-sm-8 col-lg-8">
               <div className="Personal_Details_inner Personal_bg">
                 <div className="row ">
                   <div className="col-6 col-md-6">
                     <h4>Self Node ROS</h4>
-                    <h5>{selfNodeRoi ? Number(selfNodeRoi).toString() : 0} BDLT</h5>
-                    
+                    <h5>
+                      {selfNodeRoi ? Number(selfNodeRoi).toString() : 0} BDLT
+                    </h5>
                   </div>
-                  <div className="col-6 col-md-6"> 
+                  <div className="col-6 col-md-6">
                     <h4>Sponsor Node ROS</h4>
-                    <h5>{directSponsorRoi ? Number(directSponsorRoi).toFixed(2) : 0} BDLT</h5>
+                    <h5>
+                      {directSponsorRoi
+                        ? Number(directSponsorRoi).toFixed(2)
+                        : 0}{" "}
+                      BDLT
+                    </h5>
                   </div>
                 </div>
                 <button className="grad_btn my-3" onClick={onNodeRoiWithdraw}>
@@ -1422,7 +2275,6 @@ export default function Home() {
         </div>
       </section>
 
-
       <section className="pb_50">
         <div className="container">
           <div className="all_heading text-center">
@@ -1431,42 +2283,44 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container">
-            <select style={{ color: "white", backgroundColor: "black", border: "none", width: "100px" }}
-              value={selectedlevelTeam ? selectedlevelTeam : 'Level 1'}
+            <select
+              style={{
+                color: "white",
+                backgroundColor: "black",
+                border: "none",
+                width: "100px",
+              }}
+              value={selectedlevelTeam ? selectedlevelTeam : "Level 1"}
               onChange={(e) => {
                 setSelectedLevelTeam(e.target.value);
-              }}>
-              {
-                levels.map((data, index) => {
-                  return (
-                    <option value={data} key={index}>{data}</option>
-                  )
-                })
-              }
-
+              }}
+            >
+              {levels.map((data, index) => {
+                return (
+                  <option value={data} key={index}>
+                    {data}
+                  </option>
+                );
+              })}
             </select>
             <div className="table_inner">
               <div className="table-responsive gridtable">
-
                 <DataTable
                   columns={teamcolumn}
-                  data={
-                    team2 ? team2.length > 0
-                      ? team2
-                      : [] : []
-                  }
+                  data={team2 ? (team2.length > 0 ? team2 : []) : []}
                   pagination
                   paginationPerPage={4}
                   progressPending={false}
                   customStyles={customStyles}
                 />
-
+              </div>
+              <div className="text-end">
+                <Link to="/teammember">View more</Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-
 
       <section className="pb_50">
         <div className="container">
@@ -1478,29 +2332,28 @@ export default function Home() {
           <div className="sm_container">
             <div className="table_inner">
               <div className="table-responsive gridtable">
-
                 <DataTable
                   columns={requiredmembercolumn}
                   data={
-                    requiredMember ? requiredMember.length > 0
-                      ? requiredMember
-                      : [] : []
+                    requiredMember
+                      ? requiredMember.length > 0
+                        ? requiredMember
+                        : []
+                      : []
                   }
                   pagination
                   paginationPerPage={4}
                   progressPending={false}
                   customStyles={customStyles}
                 />
-
+              </div>
+              <div className="text-end">
+                <Link to="/myteamdownline">View more</Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-
-
-
 
       <section className="pb_50">
         <div className="container">
@@ -1510,57 +2363,69 @@ export default function Home() {
             </h2>
           </div>
           <div className="sm_container">
-            <select style={{ color: "white", backgroundColor: "black", border: "none", padding: "2px", width: "100px" }}
-              value={selectedlevel ? selectedlevel : 'Level 1'}
+            <select
+              style={{
+                color: "white",
+                backgroundColor: "black",
+                border: "none",
+                padding: "2px",
+                width: "100px",
+              }}
+              value={selectedlevel ? selectedlevel : "Level 1"}
               onChange={(e) => {
                 console.log("selected level::", e.target.value);
                 setSelectedLevel(e.target.value);
-              }}>
-              {
-                levels.map((data, index) => {
-                  return (
-
-                    <option value={data} key={index}>{data}</option>
-                  )
-                })
-              }
+              }}
+            >
+              {levels.map((data, index) => {
+                return (
+                  <option value={data} key={index}>
+                    {data}
+                  </option>
+                );
+              })}
             </select>
 
-            <select className="px-2" style={{ color: "white", backgroundColor: "black", border: "none" }}
+            <select
+              className="px-2"
+              style={{
+                color: "white",
+                backgroundColor: "black",
+                border: "none",
+              }}
               value={selectedIncome}
               onChange={(e) => {
                 setSelectedIncome(e.target.value);
-              }} >
+              }}
+            >
               <option>Select IncomeType</option>
-              {
-                incometype.map((data, index) => {
-                  return (
-
-                    <option value={data} key={index}>{data}</option>
-                  )
-                })
-              }
+              {incometype.map((data, index) => {
+                return (
+                  <option value={data} key={index}>
+                    {data}
+                  </option>
+                );
+              })}
             </select>
             <div className="table_inner">
               <div className="table-responsive gridtable">
                 <DataTable
                   columns={incomecolumn}
-                  data={
-                    income2 ? income2.length > 0
-                      ? income2
-                      : [] : []
-                  }
+                  data={income2 ? (income2.length > 0 ? income2 : []) : []}
+                  // defaultSortFieldId={income2.slice(-1)[0].id}
                   pagination
                   paginationPerPage={4}
                   progressPending={false}
                   customStyles={customStyles}
                 />
               </div>
+              <div className="text-end">
+                <Link to="/rewards"> view more</Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
 
       <section className="pb_50 text-light">
         <div className="container">
@@ -1572,7 +2437,6 @@ export default function Home() {
           <div className="sm_container text-light">
             <div className="table_inner">
               <div className="table-responsive gridtable">
-
                 <DataTable
                   columns={withdrawcolumn}
                   data={withdraw ? withdraw : []}
@@ -1581,7 +2445,63 @@ export default function Home() {
                   progressPending={false}
                   customStyles={customStyles}
                 />
+              </div>
+              <div className="text-end">
+                <Link to="/withdrawhistory">view more</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <section className="pb_50 text-light">
+        <div className="container">
+          <div className="all_heading text-center">
+            <h2>
+              <span>Royality Income</span>
+            </h2>
+          </div>
+          <div className="sm_container text-light">
+            <div className="table_inner">
+              <div className="table-responsive gridtable">
+                <DataTable
+                  columns={royalityincomecolumn}
+                  data={royalityIncome ? royalityIncome : []}
+                  pagination
+                  paginationPerPage={4}
+                  progressPending={false}
+                  customStyles={customStyles}
+                />
+              </div>
+              <div className="text-end">
+                <Link to="/royalityincome">view more</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb_50 text-light">
+        <div className="container">
+          <div className="all_heading text-center">
+            <h2>
+              <span>Royality History</span>
+            </h2>
+          </div>
+          <div className="sm_container text-light">
+            <div className="table_inner">
+              <div className="table-responsive gridtable">
+                <DataTable
+                  columns={royalitycolumn}
+                  data={royalityHistory ? royalityHistory : []}
+                  pagination
+                  paginationPerPage={4}
+                  progressPending={false}
+                  customStyles={customStyles}
+                />
+              </div>
+              <div className="text-end">
+                <Link to="/royalityhistory">view more</Link>
               </div>
             </div>
           </div>
@@ -1613,7 +2533,6 @@ export default function Home() {
             </select> */}
             <div className="table_inner">
               <div className="table-responsive gridtable">
-
                 <DataTable
                   columns={noderewardcolumn}
                   data={levelNode ? levelNode : []}
@@ -1622,13 +2541,14 @@ export default function Home() {
                   progressPending={false}
                   customStyles={customStyles}
                 />
-
+              </div>
+              <div className="text-end">
+                <Link to="/nodereward">view more</Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-
 
       <section className="pb_50">
         <div className="container">
@@ -1671,11 +2591,33 @@ export default function Home() {
                 <div className="share-with">
                   <span>Share With</span>
                   <div className="py-2">
-                    <a className="p-2 mx-2" href={`https://telegram.me/share/url?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`} target="_blank"><BsTelegram size={24} color="white" /></a>
-                    <a className="p-2 mx-2" href={`whatsapp://send?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`} target="_blank"><BsWhatsapp size={24} color="white" /></a>
-                    <a className="p-2 mx-2" href={`https://www.facebook.com/sharer/sharer.php?u=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`} target="_blank"><BsFacebook size={24} color="white" /></a>
-                    <a className="p-2 mx-2" href={`https://www.instagram.com/?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`}><BsInstagram size={24} color="white" /></a>
-
+                    <a
+                      className="p-2 mx-2"
+                      href={`https://telegram.me/share/url?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`}
+                      target="_blank"
+                    >
+                      <BsTelegram size={24} color="white" />
+                    </a>
+                    <a
+                      className="p-2 mx-2"
+                      href={`whatsapp://send?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`}
+                      target="_blank"
+                    >
+                      <BsWhatsapp size={24} color="white" />
+                    </a>
+                    <a
+                      className="p-2 mx-2"
+                      href={`https://www.facebook.com/sharer/sharer.php?u=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`}
+                      target="_blank"
+                    >
+                      <BsFacebook size={24} color="white" />
+                    </a>
+                    <a
+                      className="p-2 mx-2"
+                      href={`https://www.instagram.com/?url=http://bdltcommunity.io/?ref_id=${ref_id}&text= Join BDLT Community`}
+                    >
+                      <BsInstagram size={24} color="white" />
+                    </a>
                   </div>
                 </div>
               </>
