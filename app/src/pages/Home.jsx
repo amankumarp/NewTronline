@@ -114,8 +114,10 @@ export default function Home() {
   const [mobileErr, setMobileErr] = useState(false);
   const [aadhaarErr, setAadhaarErr] = useState(false);
   const [addressErr, setAddressErr] = useState(false);
-  const [id, setID] = useState('')
-  
+  const [id, setID] = useState("");
+  const [nodeAmount, setNodeAmount] = useState("");
+  const [joinAmount1, setJoinAmoun1] = useState("");
+
   const dispatch = useDispatch();
   const levels = [
     "Level 1",
@@ -164,7 +166,7 @@ export default function Home() {
     "Stair Income",
     "Star Income",
     "Node Stair Income",
-    "Sponsor ROI income"
+    "Sponsor ROI income",
   ];
   const nodeType = ["Sponsor Node", "Stair Node"];
   const { Waddress, isLoggedIn, wallet_balance, joinPackage, contractAddress } =
@@ -200,7 +202,7 @@ export default function Home() {
       "level_income",
       "direct_sponcer",
       "node_stair_income",
-      "sponcer_roi_income"
+      "sponcer_roi_income",
     ];
     if (income.length > 0 && selectedIncome) {
       // console.log(selectedIncome, "selected income------------------")
@@ -225,16 +227,15 @@ export default function Home() {
         const arr = income.filter((item) => item._for === it1);
         // console.log(it1, arr);
         setIncome2(arr);
-      }  else if (selectedIncome === "Sponsor ROI income") {
+      } else if (selectedIncome === "Sponsor ROI income") {
         it1 = itarr[4];
         const arr = income.filter((item) => item._for === it1);
         // console.log(it1, arr);
         setIncome2(arr);
-        console.log('====================================');
+        console.log("====================================");
         console.log(arr, "roi income");
-        console.log('====================================');
-      }
-      else {
+        console.log("====================================");
+      } else {
         setIncome2(income);
       }
     }
@@ -473,7 +474,9 @@ export default function Home() {
           ? "Star Income"
           : row._for == "node_stair_income"
           ? "Node Stair Reward"
-          : row._for == "sponcer_roi_income" ? "Sponcer ROI Income" : "Stair Income",
+          : row._for == "sponcer_roi_income"
+          ? "Sponcer ROI Income"
+          : "Stair Income",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -768,20 +771,22 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log("addressreflected::",wallet_address, fwaddress);
-    setWalletAddress(fwaddress);
+    // console.log("addressreflected::", wallet_address, "ghhg", fwaddress);
+    if (fwaddress) {
+      setWalletAddress(fwaddress);
+    }
     if (wallet_address) {
       getUserInfo(wallet_address)
         .then((d) => {
-          console.log(d);
-          if (d.status == 1) {
+          console.log(d, "::DDDD");
+          if (d.status == 1 && d.data.id != 0) {
             setref_id(d.data.id);
             setDirectIncome(
               d.data.sponcerIncome
                 ? round(Number(d.data.sponcerIncome) / 1e18)
                 : 0
             );
-            setLdp(d.user[0].qualified_ldp);
+            // setLdp(d.user[0].qualified_ldp);
             // setLdp(1);
             setOldRoi(
               d.user[0].old_roi ? round(Number(d.user[0].old_roi) / 1e18) : 0
@@ -823,11 +828,11 @@ export default function Home() {
                 : 0
             );
             setRefferer(d.data.referrer);
-            setID(d.user[0].referrerId)
+            setID(d.user[0].referrerId);
             console.log("Royalty Wallet :: ", d.user[0].royalty_wallet);
             setRoyaltyWallet(d.user[0].royalty_wallet);
             setjoinAmount(d.data.joiningAmt);
-            
+
             setDirectSponcer(d.data.partnersCount);
             setWithdrawAmt(
               d.data.withdrawn
@@ -906,8 +911,8 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
-    }else{
-      console.log("reflection else:")
+    } else {
+      console.log("reflection else:");
     }
     // nodeJoiningAmount()
   }, [wallet_address, reflect, fwaddress]);
@@ -930,9 +935,9 @@ export default function Home() {
     return String(x);
   }
 
-  console.log('====================================');
+  console.log("====================================");
   console.log(id, "REFFEREL IDDD");
-  console.log('====================================');
+  console.log("====================================");
 
   async function onRegistration() {
     setspin("spinner-border spinner-border-sm");
@@ -1221,7 +1226,7 @@ export default function Home() {
     setWalletAddress(Waddress);
     setJoiningPackage(joinPackage);
   }, []);
-  
+
   return (
     <>
       {/* <div className="container">
@@ -1737,7 +1742,27 @@ export default function Home() {
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Joining Package{" "}
                   {": " + parseInt(joiningPackage / 1e18)} BDLT
                 </div>
-                <div className="col-md-8 col-lg-8 col-sm-8">
+                <div className="col-md-4 col-lg-4 col-sm-4">
+                  <div className="form-group">
+                    {ref_id != 0 ? null : (
+                      <input
+                        className="cus_input"
+                        type="text"
+                        name="join_amount"
+                        placeholder="Enter Joining Package in multiple of 1250"
+                        onChange={(e) => {
+                          setJoinAmoun1(
+                            e.target.value
+                              .replace(/[^0-9.]/g, "")
+                              .replace(/(\..*?)\..*/g, "$1")
+                          );
+                        }}
+                        value={joinAmount1}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="col-md-4 col-lg-4 col-sm-4">
                   <div className="form-group">
                     {ref_id != 0 ? null : (
                       <input
@@ -1762,8 +1787,14 @@ export default function Home() {
                         onClick={() => {
                           if (wallet_address) {
                             if (ref_id1) {
-                              setdisable(true);
-                              onRegistration(contract, wallet_address);
+                              if (joinAmount1 % 1250 == 0) {
+                                setdisable(true);
+                                onRegistration(contract, wallet_address);
+                              } else {
+                                NotificationManager.info(
+                                  "Please enter joining Package in multiple of 1250"
+                                );
+                              }
                             } else {
                               NotificationManager.info(
                                 "Please provide Referral Id"
@@ -1858,6 +1889,9 @@ export default function Home() {
                             setContract(d?.contract);
                             setWalletAddress(d?.userAddress);
                             setJoiningPackage(d?.joiningPackage);
+                            console.log("====================================");
+                            console.log(d?.joiningPackage, d?.userAddress);
+                            console.log("====================================");
                           })
                           .catch((e) => console.log(e));
                       }}
@@ -2067,12 +2101,34 @@ export default function Home() {
                         <div className="row ">
                           <div className="col-4 col-md-6 mx-auto">
                             <h4>Node Buy Amount</h4>
-                            <h5>50000 BDLT</h5>
+                            <input
+                              style={{ color: "white" }}
+                              className="cus_input"
+                              type="text"
+                              value={nodeAmount}
+                              name="sponsor_address"
+                              placeholder="Enter Node amount in multiple of 10000 "
+                              onChange={(e) => {
+                                setNodeAmount(
+                                  e.target.value
+                                    .replace(/[^0-9.]/g, "")
+                                    .replace(/(\..*?)\..*/g, "$1")
+                                );
+                              }}
+                            />
                           </div>
                         </div>
                         <button
                           className="grad_btn my-3"
-                          onClick={onUpgradeNode}
+                          onClick={() => {
+                            if (nodeAmount % 10000 == 0) {
+                              onUpgradeNode();
+                            } else {
+                              NotificationManager.info(
+                                "Enter amount in multiple of 10000!!"
+                              );
+                            }
+                          }}
                         >
                           Stake Node
                         </button>
@@ -2133,12 +2189,18 @@ export default function Home() {
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-12">
-              <div className="Personal_Details_inner" style={{padding: "17px 10px"}}>
+              <div
+                className="Personal_Details_inner"
+                style={{ padding: "17px 10px" }}
+              >
                 <h4>Referred By </h4>
                 <h5>
                   {refferer.substr(0, 5)}......{refferer.substr(-8)}
                 </h5>
-                <h6> <b>({id})</b> </h6>
+                <h6>
+                  {" "}
+                  <b>({id})</b>{" "}
+                </h6>
               </div>
             </div>
           </div>

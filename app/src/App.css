@@ -151,7 +151,7 @@
 .cus_input {
     background: 0 0;
     border-radius: 5px;
-    color: #32defa;
+    color: white;
     border: 1px solid #32defa;
     padding: 10px;
     width: 100%;
@@ -522,11 +522,26 @@ element.style {}
 .cus_input {
     background: 0 0;
     border-radius: 5px;
-    color: #8dc6ff;
+    color: white;
     border: 1px solid #3e5a85;
     padding: 10px;
     width: 100%;
 }
+
+::placeholder {
+    color: white;
+    opacity: 1; /* Firefox */
+  }
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: white;
+   }
+   
+   ::-ms-input-placeholder { /* Microsoft Edge */
+    color: white;
+   }
+
+
+
 
 @media only screen and (max-width: 760px) {
     .trx_btn li {
