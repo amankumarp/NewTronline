@@ -50,6 +50,7 @@ import {
 export default function Home() {
   const { isUnstake } = useSelector((state) => state.appStore);
   const [wallet_address, setWalletAddress] = useState("");
+  const [fwaddress, setfwaddress] = useState("");
   const [balance, setBalance] = useState(0);
   const [team, setTeam] = useState([]);
   const [requiredMember, getRequiredMember] = useState([]);
@@ -113,7 +114,8 @@ export default function Home() {
   const [mobileErr, setMobileErr] = useState(false);
   const [aadhaarErr, setAadhaarErr] = useState(false);
   const [addressErr, setAddressErr] = useState(false);
-  const [sucModel, setSucModel] = useState();
+  const [id, setID] = useState('')
+  
   const dispatch = useDispatch();
   const levels = [
     "Level 1",
@@ -162,6 +164,7 @@ export default function Home() {
     "Stair Income",
     "Star Income",
     "Node Stair Income",
+    "Sponsor ROI income"
   ];
   const nodeType = ["Sponsor Node", "Stair Node"];
   const { Waddress, isLoggedIn, wallet_balance, joinPackage, contractAddress } =
@@ -197,6 +200,7 @@ export default function Home() {
       "level_income",
       "direct_sponcer",
       "node_stair_income",
+      "sponcer_roi_income"
     ];
     if (income.length > 0 && selectedIncome) {
       // console.log(selectedIncome, "selected income------------------")
@@ -221,7 +225,16 @@ export default function Home() {
         const arr = income.filter((item) => item._for === it1);
         // console.log(it1, arr);
         setIncome2(arr);
-      } else {
+      }  else if (selectedIncome === "Sponsor ROI income") {
+        it1 = itarr[4];
+        const arr = income.filter((item) => item._for === it1);
+        // console.log(it1, arr);
+        setIncome2(arr);
+        console.log('====================================');
+        console.log(arr, "roi income");
+        console.log('====================================');
+      }
+      else {
         setIncome2(income);
       }
     }
@@ -286,8 +299,8 @@ export default function Home() {
     console.log("embue1::", url);
     if (url && url.length > 21) {
       setWalletAddress(url);
+      setfwaddress(url);
     }
-
     console.log("Referrer Id", ref_addr);
     let nnnnn = ref_addr.split("?ref_id=");
     setref_id1(nnnnn[1]);
@@ -303,7 +316,6 @@ export default function Home() {
       .catch((e) => console.log(e));
   }, []);
 
-  let j = 2;
   const requiredmembercolumn = [
     {
       name: "Level",
@@ -461,7 +473,7 @@ export default function Home() {
           ? "Star Income"
           : row._for == "node_stair_income"
           ? "Node Stair Reward"
-          : "Stair Income",
+          : row._for == "sponcer_roi_income" ? "Sponcer ROI Income" : "Stair Income",
       sortable: true,
       style: {
         backgroundColor: "transparent",
@@ -756,6 +768,8 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log("addressreflected::",wallet_address, fwaddress);
+    setWalletAddress(fwaddress);
     if (wallet_address) {
       getUserInfo(wallet_address)
         .then((d) => {
@@ -809,10 +823,11 @@ export default function Home() {
                 : 0
             );
             setRefferer(d.data.referrer);
+            setID(d.user[0].referrerId)
             console.log("Royalty Wallet :: ", d.user[0].royalty_wallet);
             setRoyaltyWallet(d.user[0].royalty_wallet);
             setjoinAmount(d.data.joiningAmt);
-
+            
             setDirectSponcer(d.data.partnersCount);
             setWithdrawAmt(
               d.data.withdrawn
@@ -891,9 +906,11 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+    }else{
+      console.log("reflection else:")
     }
     // nodeJoiningAmount()
-  }, [wallet_address, reflect]);
+  }, [wallet_address, reflect, fwaddress]);
 
   function toFixed(x) {
     if (Math.abs(x) < 1.0) {
@@ -912,6 +929,10 @@ export default function Home() {
     }
     return String(x);
   }
+
+  console.log('====================================');
+  console.log(id, "REFFEREL IDDD");
+  console.log('====================================');
 
   async function onRegistration() {
     setspin("spinner-border spinner-border-sm");
@@ -1203,7 +1224,7 @@ export default function Home() {
   
   return (
     <>
-      <div className="container">
+      {/* <div className="container">
         <div className="ticker">
           <div className="news">
             <marquee className="news-content">
@@ -1214,7 +1235,7 @@ export default function Home() {
             </marquee>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="container text-center mt-4">
         <div className="row">
           <div
@@ -2112,11 +2133,12 @@ export default function Home() {
               </div>
             </div>
             <div className="col-md-4 col-sm-4 col-12">
-              <div className="Personal_Details_inner">
-                <h4>Referred By</h4>
+              <div className="Personal_Details_inner" style={{padding: "17px 10px"}}>
+                <h4>Referred By </h4>
                 <h5>
                   {refferer.substr(0, 5)}......{refferer.substr(-8)}
                 </h5>
+                <h6> <b>({id})</b> </h6>
               </div>
             </div>
           </div>
