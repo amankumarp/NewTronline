@@ -769,7 +769,9 @@ export default function Home() {
 
   useEffect(() => {
     console.log("addressreflected::",wallet_address, fwaddress);
+    if(fwaddress){
     setWalletAddress(fwaddress);
+    }
     if (wallet_address) {
       getUserInfo(wallet_address)
         .then((d) => {
