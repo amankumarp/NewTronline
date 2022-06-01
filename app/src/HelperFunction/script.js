@@ -1,6 +1,6 @@
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from './config';
 import getWeb3 from "./getWeb";
-const url = "https://testapi.bdltcommunity.io/api";
+const url = "https://api.bdltcommunity.io/api";
 // const url = "http://localhost:8080/api";
 
 export const onConnect = () => {
