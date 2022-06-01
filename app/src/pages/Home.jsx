@@ -1102,8 +1102,8 @@ export default function Home() {
       if (balance >= 50000) {
         setspin3("spinner-border spinner-border-sm");
         contract?.methods
-          ?.stakeNode(wallet_address)
-          .send({ from: wallet_address, value: "50000000000000000000000" })
+          ?.stakeNode(wallet_address, toFixed(nodeAmount * 1e18))
+          .send({ from: wallet_address, value: "0" })
           .then((d) => {
             console.log("Data:", d);
             setspin3("");
@@ -1771,7 +1771,9 @@ export default function Home() {
                         name="sponsor_address"
                         placeholder="Enter Refferer Id "
                         onChange={(e) => {
-                          setref_id1(e.target.value);
+                          setref_id1(e.target.value
+                            .replace(/[^0-9.]/g, "")
+                            .replace(/(\..*?)\..*/g, "$1"));
                         }}
                         value={ref_id1 ? ref_id1 : ""}
                       />
@@ -1789,7 +1791,7 @@ export default function Home() {
                             if (ref_id1) {
                               if (joinAmount1 % 1250 == 0) {
                                 setdisable(true);
-                                onRegistration(contract, wallet_address);
+                                onRegistration(contract, wallet_address, toFixed(joinAmount1 * 1e18));
                               } else {
                                 NotificationManager.info(
                                   "Please enter joining Package in multiple of 1250"
