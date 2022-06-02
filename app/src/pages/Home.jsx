@@ -942,7 +942,7 @@ export default function Home() {
   async function onRegistration() {
     setspin("spinner-border spinner-border-sm");
     // balance >= joinAmount
-    if (balance >= joinAmount) {
+    if (balance) {
       console.log("refferal Id::", ref_id1, joinAmount);
       contract.methods
         .isUserExists(wallet_address)
@@ -954,13 +954,14 @@ export default function Home() {
               .call()
               .then((d) => {
                 console.log("Refferal Address ::", d);
+                // if(balance>= joinAmount1){
                 if (d !== "0x0000000000000000000000000000000000000000") {
                   contract.methods
-                    .registrationExt(wallet_address, d)
+                    .registrationExt(wallet_address, d, toFixed(joinAmount1*1e18))
                     .send({
                       from: wallet_address,
-                      value: joiningPackage,
-                      // value: 0,
+                      // value: joiningPackage,
+                      value: 0,
                     })
                     .then((d) => {
                       setspin("");
@@ -982,6 +983,15 @@ export default function Home() {
                   setdisable(false);
                   setReflect(!reflect);
                 }
+              // }else{
+              //   NotificationManager.error(
+              //     "Please check your wallet balance",
+              //     "Insufficient balance"
+              //   );
+              //   setspin("");
+              //   setdisable(false);
+              //   setReflect(!reflect);
+              // }
               })
               .catch((e) => {
                 console.log("Error:: ", e);
@@ -1099,10 +1109,11 @@ export default function Home() {
     if (viewmodeflag) {
       NotificationManager.info("Withdraw is not available in view mode!");
     } else {
-      if (balance >= 50000) {
+      // balance>=>= 50000
+      if (balance) {
         setspin3("spinner-border spinner-border-sm");
         contract?.methods
-          ?.stakeNode(wallet_address, toFixed(nodeAmount * 1e18))
+          ?.stakeNode(wallet_address, nodeAmount+"000000000000000000")
           .send({ from: wallet_address, value: "0" })
           .then((d) => {
             console.log("Data:", d);
@@ -1771,9 +1782,11 @@ export default function Home() {
                         name="sponsor_address"
                         placeholder="Enter Refferer Id "
                         onChange={(e) => {
-                          setref_id1(e.target.value
-                            .replace(/[^0-9.]/g, "")
-                            .replace(/(\..*?)\..*/g, "$1"));
+                          setref_id1(
+                            e.target.value
+                              .replace(/[^0-9.]/g, "")
+                              .replace(/(\..*?)\..*/g, "$1")
+                          );
                         }}
                         value={ref_id1 ? ref_id1 : ""}
                       />
@@ -1791,7 +1804,11 @@ export default function Home() {
                             if (ref_id1) {
                               if (joinAmount1 % 1250 == 0) {
                                 setdisable(true);
-                                onRegistration(contract, wallet_address, toFixed(joinAmount1 * 1e18));
+                                onRegistration(
+                                  contract,
+                                  wallet_address,
+                                  toFixed(joinAmount1 * 1e18)
+                                );
                               } else {
                                 NotificationManager.info(
                                   "Please enter joining Package in multiple of 1250"

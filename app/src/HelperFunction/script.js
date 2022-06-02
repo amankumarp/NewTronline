@@ -1,6 +1,6 @@
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from './config';
 import getWeb3 from "./getWeb";
-const url = "https://testapi.bdltcommunity.io/api";
+const url = "https://tronline.io/api";
 // const url = "http://localhost:8080/api";
 
 export const onConnect = () => {
@@ -50,6 +50,7 @@ export const getUserInfo = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+
 export const getLdpInfo = (waddress, name, mobile, adhaar, address) => {
     return fetch(`${url}/apply-for-ldp`, {
             method: "POST",
@@ -105,6 +106,7 @@ export const getWithdraw = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+
 export const getRoyalityHistory = (user) => {
     return fetch(`${url}/withdraw-history`, {
             method: "POST",
@@ -130,6 +132,7 @@ export const royaltyWithdraw = (user) => {
         }).then(d => d.json())
         .catch(e => e)
 }
+
 export const userIdByWallet = (user) => {
     return fetch(`${url}/getUserIdByWallet`, {
             method: "POST",
@@ -144,7 +147,7 @@ export const userIdByWallet = (user) => {
 }
 
 export const getTeam = (user) => {
-    return fetch(`https://testapi.bdltcommunity.io/bdlt_api/team.php`, {
+    return fetch(`https://bdlttestphpapi.tronline.io/bdlt_api/team.php`, {
             method: "POST",
             body: JSON.stringify({
                 user: user,
@@ -155,7 +158,7 @@ export const getTeam = (user) => {
 
 
 export const getRequiredMembers = (user) => {
-    return fetch(`https://testapi.bdltcommunity.io/bdlt_api/level_team_member.php`, {
+    return fetch(`https://bdlttestphpapi.tronline.io/bdlt_api/level_team_member.php`, {
             method: "POST",
             body: JSON.stringify({
                 user: user,

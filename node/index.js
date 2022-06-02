@@ -22,6 +22,7 @@ const conn = mysql.createConnection({
   password: "",
   database: "bdlt",
 });
+
 function toFixed(x) {
   if (Math.abs(x) < 1.0) {
     var e = parseInt(x.toString().split("e-")[1]);
@@ -111,6 +112,7 @@ function calcLevel(level) {
     );
   })
 }
+
 function calcMemberLevel(level, total_member) {
   return new Promise((resolve, reject) => {
     console.log(level);
