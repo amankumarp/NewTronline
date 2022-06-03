@@ -957,7 +957,7 @@ export default function Home() {
                 // if(balance>= joinAmount1){
                 if (d !== "0x0000000000000000000000000000000000000000") {
                   contract.methods
-                    .registrationExt(wallet_address, d, toFixed(joinAmount1*1e18))
+                    .registrationExt(wallet_address, d, joinAmount1+"000000000000000000")
                     .send({
                       from: wallet_address,
                       // value: joiningPackage,
