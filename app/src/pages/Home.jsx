@@ -117,7 +117,12 @@ export default function Home() {
   const [id, setID] = useState("");
   const [nodeAmount, setNodeAmount] = useState("");
   const [joinAmount1, setJoinAmoun1] = useState("");
-
+  const [userDetails, setUserDetails] = useState({
+    stakeAmount: 0,
+    packageBuy: 0,
+    sponcer_roi: 0,
+    is_withdraw_enable: false,
+  });
   const dispatch = useDispatch();
   const levels = [
     "Level 1",
@@ -786,6 +791,16 @@ export default function Home() {
                 ? round(Number(d.data.sponcerIncome) / 1e18)
                 : 0
             );
+            let obj = userDetails;
+            obj["packageBuy"] = d.user[0]?.amount ? d.user[0].amount : 0;
+            obj["stakeAmount"] = d.data.node[4]
+              ? Number(d.data.node[4].slice(0, d.data.node[4].length - 18))
+              : 0;
+            obj["sponcer_roi"] = d?.sponcer_roi ? d.sponcer_roi : 0;
+            obj["is_withdraw_enable"] = d?.is_withdraw_enable
+              ? d.is_withdraw_enable
+              : false;
+            setUserDetails(obj);
             // setLdp(d.user[0].qualified_ldp);
             // setLdp(1);
             setOldRoi(
@@ -850,6 +865,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getRequiredMembers(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -859,6 +875,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getTeam(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -868,6 +885,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getIncome(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -882,6 +900,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getLevelSponsor(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -891,6 +910,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getWithdraw(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -901,6 +921,7 @@ export default function Home() {
         .catch((e) => {
           console.log(e);
         });
+
       getRoyalityHistory(wallet_address)
         .then((ss) => {
           if (ss) {
@@ -941,6 +962,7 @@ export default function Home() {
 
   async function onRegistration() {
     setspin("spinner-border spinner-border-sm");
+    console.log("coming");
     // balance >= joinAmount
     if (balance) {
       console.log("refferal Id::", ref_id1, joinAmount);
@@ -957,7 +979,11 @@ export default function Home() {
                 // if(balance>= joinAmount1){
                 if (d !== "0x0000000000000000000000000000000000000000") {
                   contract.methods
-                    .registrationExt(wallet_address, d, joinAmount1+"000000000000000000")
+                    .registrationExt(
+                      wallet_address,
+                      d,
+                      joinAmount1 + "000000000000000000"
+                    )
                     .send({
                       from: wallet_address,
                       // value: joiningPackage,
@@ -983,15 +1009,15 @@ export default function Home() {
                   setdisable(false);
                   setReflect(!reflect);
                 }
-              // }else{
-              //   NotificationManager.error(
-              //     "Please check your wallet balance",
-              //     "Insufficient balance"
-              //   );
-              //   setspin("");
-              //   setdisable(false);
-              //   setReflect(!reflect);
-              // }
+                // }else{
+                //   NotificationManager.error(
+                //     "Please check your wallet balance",
+                //     "Insufficient balance"
+                //   );
+                //   setspin("");
+                //   setdisable(false);
+                //   setReflect(!reflect);
+                // }
               })
               .catch((e) => {
                 console.log("Error:: ", e);
@@ -1113,7 +1139,7 @@ export default function Home() {
       if (balance) {
         setspin3("spinner-border spinner-border-sm");
         contract?.methods
-          ?.stakeNode(wallet_address, nodeAmount+"000000000000000000")
+          ?.stakeNode(wallet_address, nodeAmount + "000000000000000000")
           .send({ from: wallet_address, value: "0" })
           .then((d) => {
             console.log("Data:", d);
@@ -1582,6 +1608,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+
       <Modal show={showModal1} onHide={handleClose1} style={{ color: "black" }}>
         <Modal.Header closeButton>
           {/* <Modal.Title style={{ color: "black" }}>
@@ -1714,7 +1741,7 @@ export default function Home() {
                     onClick={() => {
                       onConnect()
                         .then((d) => {
-                          console.log(d);
+                          console.log("msg of connect::", d);
                           dispatch({ type: SET_ADDRESS, data: d?.userAddress });
                           dispatch({ type: SET_LOGGEDIN, data: true });
                           dispatch({ type: TOTAL_BALANCE, data: d?.balance });
@@ -1889,7 +1916,7 @@ export default function Home() {
                       onClick={() => {
                         onConnect()
                           .then((d) => {
-                            console.log(d);
+                            console.log("msg of connect::", d);
                             dispatch({
                               type: SET_ADDRESS,
                               data: d?.userAddress,
@@ -2163,7 +2190,12 @@ export default function Home() {
                         <div className="row ">
                           <div className="col-4 col-md-6 mx-auto">
                             <h4>Node Staked Amount</h4>
-                            <h5>50000 BDLT</h5>
+                            <h5>
+                              {userDetails.stakeAmount > 0
+                                ? userDetails.stakeAmount
+                                : 0}{" "}
+                              BDLT
+                            </h5>
                           </div>
                         </div>
                         {/*  {isUnstake ? null :
@@ -2194,6 +2226,7 @@ export default function Home() {
               <span>Dashboard</span>
             </h2>
           </div>
+
           <div className="row cus_row">
             <div className="col-md-4 col-sm-4 col-6">
               <div className="Personal_Details_inner Personal_bg">
@@ -2220,6 +2253,28 @@ export default function Home() {
                   {" "}
                   <b>({id})</b>{" "}
                 </h6>
+              </div>
+            </div>
+          </div>
+          <div className="row cus_row">
+            <div className="col-md-6 col-sm-12 col-6">
+              <div className="Personal_Details_inner Personal_bg">
+                <h4>Your Package</h4>
+                <h5>
+                  {userDetails.packageBuy > 0
+                    ? Number(userDetails.packageBuy) / 1e18
+                    : 0}
+                </h5>
+              </div>
+            </div>
+            <div className="col-md-6 col-sm-12 col-6">
+              <div className="Personal_Details_inner">
+                <h4> Sponcer ROI Income</h4>
+                <h5>
+                  {userDetails.sponcer_roi != 0
+                    ? Number(userDetails.sponcer_roi) / 1e18
+                    : 0}
+                </h5>
               </div>
             </div>
           </div>
@@ -2304,7 +2359,16 @@ export default function Home() {
               <div className="Personal_Details_inner Personal_bg">
                 <h4>ROS Reward</h4>
                 <h5>{Number(roi).toFixed(2)} BDLT</h5>
-                <button className="grad_btn my-2" onClick={onWithdraw}>
+                <button
+                  className="grad_btn my-2"
+                  onClick={() => {
+                    if (userDetails.is_withdraw_enable) {
+                      onWithdraw();
+                    } else {
+                      NotificationManager.info("Your ROS withdrawal disabled");
+                    }
+                  }}
+                >
                   Withdraw ROS
                 </button>
               </div>
@@ -2313,7 +2377,18 @@ export default function Home() {
               <div className="Personal_Details_inner Personal_bg">
                 <h4>Royalty Reward</h4>
                 <h5>{royaltyWallet ? royaltyWallet : 0} BDLT</h5>
-                <button className="grad_btn my-2" onClick={onRoyaltyWithdraw}>
+                <button
+                  className="grad_btn my-2"
+                  onClick={() => {
+                    if (userDetails.is_withdraw_enable) {
+                      onRoyaltyWithdraw();
+                    } else {
+                      NotificationManager.info(
+                        "Your Royalty withdrawal disabled"
+                      );
+                    }
+                  }}
+                >
                   Withdraw Royalty
                 </button>
               </div>
@@ -2369,7 +2444,18 @@ export default function Home() {
                     </h5>
                   </div>
                 </div>
-                <button className="grad_btn my-3" onClick={onNodeRoiWithdraw}>
+                <button
+                  className="grad_btn my-3"
+                  onClick={() => {
+                    if (userDetails.is_withdraw_enable) {
+                      onNodeRoiWithdraw();
+                    } else {
+                      NotificationManager.info(
+                        "Your sponcer ROS withdrawal disabled"
+                      );
+                    }
+                  }}
+                >
                   Withdraw
                 </button>
               </div>
