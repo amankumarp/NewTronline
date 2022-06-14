@@ -2168,7 +2168,10 @@ export default function Home() {
                           className="grad_btn my-3"
                           onClick={() => {
                             if (nodeAmount % 10000 == 0) {
+                              if(nodeAmount>=10000&&nodeAmount<=100000)
                               onUpgradeNode();
+                              else 
+                              NotificationManager.error("Invalid Amount Entered!");
                             } else {
                               NotificationManager.info(
                                 "Enter amount in multiple of 10000!!"
